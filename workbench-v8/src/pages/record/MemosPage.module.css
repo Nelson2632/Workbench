@@ -1,0 +1,26 @@
+/* MemosPage — 备忘录 */
+.page { display: flex; flex-direction: column; gap: 20px; }
+.inputArea { display: flex; flex-direction: column; gap: 8px; }
+.textarea { width: 100%; padding: 12px 14px; font-size: 14px; color: var(--color-text-primary); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); resize: vertical; outline: none; font-family: inherit; line-height: 1.6; transition: border-color var(--transition-fast); }
+.textarea:focus { border-color: var(--color-border-focus); }
+.textarea::placeholder { color: var(--color-text-tertiary); }
+.inputFooter { display: flex; align-items: center; justify-content: space-between; }
+.hint { font-size: 12px; color: var(--color-text-tertiary); }
+.searchBar { position: relative; }
+.searchInput { width: 100%; padding: 10px 14px; font-size: 14px; color: var(--color-text-primary); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); outline: none; box-sizing: border-box; }
+.searchInput:focus { border-color: var(--color-border-focus); }
+.searchClear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 18px; color: var(--color-text-tertiary); cursor: pointer; }
+.memoList { display: flex; flex-direction: column; gap: 12px; }
+.memoCard { display: flex; flex-direction: column; gap: 8px; }
+.memoContentWrap { cursor: default; }
+.memoContentExpandable { cursor: pointer; }
+.memoContent { margin: 0; font-size: 14px; line-height: 1.6; color: var(--color-text-primary); white-space: pre-wrap; }
+.expandHint { font-size: 12px; color: var(--color-text-tertiary); }
+.memoMeta { display: flex; align-items: center; gap: 8px; }
+.memoTime { font-size: 12px; color: var(--color-text-tertiary); }
+.memoActions { display: flex; flex-wrap: wrap; gap: 4px; }
+.taskForm { display: flex; flex-direction: column; gap: 16px; }
+.taskFormGroup { display: flex; flex-direction: column; gap: 6px; }
+.taskLabel { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); }
+.taskInput { padding: 10px 14px; font-size: 14px; color: var(--color-text-primary); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-sm); outline: none; }
+.taskFormActions { display: flex; justify-content: flex-end; gap: 8px; }

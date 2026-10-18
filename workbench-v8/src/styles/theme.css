@@ -1,0 +1,1075 @@
+/* ============================================================
+   Personal Workbench V8 — Design Foundation v2.0
+   依据：V8_DESIGN_MASTER_IMPLEMENTATION_SPEC_v1.0.md
+
+   核心：四套主题不是「同一 UI 换四套颜色」，而是同一套 Personal OS
+   在四种不同视觉空间中的表达（A 书房 / C 桌面 / D 夜航 / F 观测舱）。
+   主题差异 = Color + Material + Surface + Depth + Shape + Light + Motion。
+
+   消费方式（CODE）：
+   - 全局主题由 data-theme 驱动，值域仅 mist | fluent | night。
+   - 复盘数据驾驶舱为页面级作用域：data-visual-scope="review-data"。
+   - 页面与组件只消费 --color-* / --radius-* / --shadow-* / --space-* / --font-* / --transition-*。
+   ============================================================ */
+
+/* ============================================================
+   1. 基础令牌（跨主题共享的结构令牌 + Brand Accent）
+   ============================================================ */
+:root {
+  --color-brand: #4c6fe8;
+  --color-brand-hover: #3855cc;
+  --color-brand-light: #e9edfb;
+  --color-brand-text: #ffffff;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-full: 9999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+
+  /* 契约 A1.2 Spacing Scale 语义别名（xs/sm/md/lg/xl/xxl/xxxl = 4/8/16/24/32/48/64）。
+     与上方 --space-1..8（历史数字尺）并存；新代码优先使用语义别名。 */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-xxl: 48px;
+  --space-xxxl: 64px;
+
+  /* 契约 A1.3 语义间距层级（L1 大转折 → L5 文本行内，严格降序）。
+     Mist 为基线值；Fluent / Night / review-data 在各自作用域按 A3.4 密度覆盖。
+     SectionBoundaryRule：actual_gap = max(semantic, content)，禁止 L1+L2 叠加。 */
+  --space-l1: 64px; /* 大转折 / 主要语义转换 */
+  --space-l2: 48px; /* 一般语义切换（同 Section 内部）*/
+  --space-l25: 32px; /* L2.5 同级功能切换（Panel→Panel）*/
+  --space-l3: 24px; /* 同块内子项（Now→Next / LIFE→PLAY）*/
+  --space-l4: 16px; /* 对象间距（Card→Card）*/
+  --space-l5: 8px; /* 文本行内（Flow 内部元素）*/
+
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial,
+    sans-serif;
+  --font-mono: 'Cascadia Code', 'SF Mono', Consolas, 'JetBrains Mono', Menlo,
+    monospace;
+
+  --font-size-xs: 11px;
+  --font-size-sm: 13px;
+  --font-size-base: 15px;
+  --font-size-md: 15px;
+  --font-size-lg: 18px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 26px;
+  --font-size-3xl: 32px;
+  --font-size-display: 32px;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 550;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --transition-fast: 140ms ease;
+  --transition-normal: 240ms ease;
+  --transition-slow: 400ms ease;
+  --ease-out-soft: cubic-bezier(0.2, 0, 0, 1);
+
+  --border-width: 1px;
+
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --sidebar-w: 240px;
+  --sidebar-w-collapsed: 68px;
+  --header-h: 64px; /* A1.1 Header 高度（范围 56~72px）*/
+  --tooltip-delay: 400ms; /* B4.1 Sidebar 折叠态 tooltip 延迟 */
+}
+
+/* ============================================================
+   2. A「晨雾书房」mist — 白天默认
+   命题：「晨光落在书桌上的第一小时」
+   纸张 / 晨光 / 书页 / 木质 / 雾气 / 留白 / 温润 / 安静
+   不是奶油风，不是卡通手账，也不是普通米白 SaaS。
+   ============================================================ */
+:root,
+[data-theme='mist'] {
+  color-scheme: light;
+
+  --color-bg: #f7f3ee;
+  --color-surface: rgba(255, 255, 255, 0.78);
+  --color-surface-2: rgba(250, 247, 242, 0.92);
+
+  /* B1.1 Mist shell（侧栏 / 头部壳色）*/
+  --color-shell: #F1EEE8;
+
+  --color-text-primary: #2d2a26;
+  --color-text-secondary: #6b6863;
+  --color-text-tertiary: #9a9791;
+  --color-text-inverse: #ffffff;
+
+  /* 主题 Accent：暖木 / 琥珀金棕（契约 #C58F5E，非蓝）*/
+  --color-accent: #C58F5E;
+  --color-accent-hover: #B07A4A;
+  --color-accent-light: #EDD9C0;
+  --color-accent-text: #3b2e1c;
+
+  --color-border: rgba(70, 60, 50, 0.08);
+  --color-border-light: rgba(70, 60, 50, 0.045);
+  --color-border-focus: #C58F5E;
+
+  --color-success: #4f8f68;
+  --color-success-light: #e7efe8;
+  --color-warning: #b98b3e;
+  --color-warning-light: #f3ead7;
+  --color-danger: #bc5a50;
+  --color-danger-light: #f4e6e3;
+  --color-info: #8a9bb0;
+  --color-info-light: #eaeef2;
+
+  --shadow-sm: 0 2px 8px rgba(65, 50, 35, 0.025);
+  --shadow-md: 0 8px 24px rgba(65, 50, 35, 0.045);
+  --shadow-lg: 0 14px 40px rgba(65, 50, 35, 0.06);
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+
+/* ============================================================
+   3. C「Windows Fluent」fluent — 手动切换
+   命题：「一个属于桌面的浮空窗口系统」
+   Mica / Acrylic / Transparency / Blur / Floating / Depth / Native
+   ============================================================ */
+[data-theme='fluent'] {
+  color-scheme: light;
+
+  --color-bg: #eef4ff;
+  --color-surface: rgba(255, 255, 255, 0.58);
+  --color-surface-2: rgba(255, 255, 255, 0.72);
+
+  --color-text-primary: #1a2035;
+  --color-text-secondary: #5b6580;
+  --color-text-tertiary: #8b95b0;
+  --color-text-inverse: #ffffff;
+
+  --color-accent: #3B82F6;
+  --color-accent-hover: #2563EB;
+  --color-accent-light: #93C5FD;
+  --color-accent-text: #ffffff;
+
+  --color-border: rgba(255, 255, 255, 0.46);
+  --color-border-light: rgba(255, 255, 255, 0.26);
+  --color-border-focus: #3B82F6;
+
+  --color-success: #2f9e67;
+  --color-success-light: #dff3e9;
+  --color-warning: #c07d18;
+  --color-warning-light: #fcf0d8;
+  --color-danger: #d4483c;
+  --color-danger-light: #fbe6e4;
+  --color-info: #5b8def;
+  --color-info-light: #e6f0ff;
+
+  --shadow-sm: 0 2px 6px rgba(30, 60, 120, 0.06);
+  --shadow-md: 0 8px 20px rgba(30, 60, 120, 0.09);
+  --shadow-lg: 0 18px 44px rgba(30, 60, 120, 0.12);
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+
+  /* B1.2 Fluent acrylic 材质令牌（blur 由材质类负责，见 §11）*/
+  --acrylic-1: rgba(255, 255, 255, 0.55);
+  --acrylic-2: rgba(255, 255, 255, 0.72);
+  --acrylic-panel: rgba(255, 255, 255, 0.92);
+
+  /* A3.4 Fluent 密度（标准）：严格降序 L1>L2>L2.5>L3>L4>L5 */
+  --space-l1: 56px;
+  --space-l2: 40px;
+  --space-l25: 24px;
+  --space-l3: 20px;
+  --space-l4: 14px;
+  --space-l5: 8px;
+}
+
+/* ============================================================
+   4. D「深色夜航」night — 夜间默认
+   命题：「夜晚仍愿意连续使用几小时的空间」
+   Night / Depth / Quiet / Focus / Low Stimulus / Reading
+   ============================================================ */
+[data-theme='night'] {
+  color-scheme: dark;
+
+  --color-bg: #0f121a;
+  --color-surface: rgba(30, 34, 48, 0.74);
+  --color-surface-2: rgba(40, 45, 65, 0.84);
+
+  --color-text-primary: #e8ebf2;
+  --color-text-secondary: #a0a7bd;
+  --color-text-tertiary: #6b7390;
+  --color-text-inverse: #0f121a;
+
+  /* 主题 Accent：暖白 glow（低刺激，非霓虹）*/
+  --color-accent: #E8DCC8;
+  --color-accent-hover: #F3E9D8;
+  --color-accent-light: rgba(232, 220, 200, 0.12);
+  --color-accent-text: #0f121a;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-light: rgba(255, 255, 255, 0.045);
+  --color-border-focus: #E8DCC8;
+
+  --color-success: #4cc38a;
+  --color-success-light: #12271f;
+  --color-warning: #d9a13b;
+  --color-warning-light: #2b2113;
+  --color-danger: #e06c6c;
+  --color-danger-light: #2b1919;
+  --color-info: #8A93A0;
+  --color-info-light: #1E222A;
+
+  --shadow-sm: 0 3px 10px rgba(0, 0, 0, 0.22);
+  --shadow-md: 0 8px 22px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 18px 42px rgba(0, 0, 0, 0.34);
+
+  /* B1.3 Night 令牌：聚焦面 + 暖白 glow */
+  --color-focused-surface: #2E3540;
+  --color-glow: #E8DCC8;
+
+  /* A3.4 Night 密度（较松）：严格降序 L1>L2>L2.5>L3>L4>L5 */
+  --space-l1: 64px;
+  --space-l2: 44px;
+  --space-l25: 28px;
+  --space-l3: 20px;
+  --space-l4: 14px;
+  --space-l5: 8px;
+}
+
+/* ============================================================
+   5. F「数据驾驶舱」review-data — 页面级作用域（非全局主题）
+   命题：「不是深色 Dashboard，而是只在复盘时打开的数据观测舱」
+   覆盖背景/表面/文字/强调/阴影，形成独立的深色全息空间。
+   ============================================================ */
+[data-visual-scope='review-data'],
+[data-scope='review-data'] {
+  color-scheme: dark;
+
+  --color-bg: #050a15;
+  --color-surface: rgba(10, 20, 40, 0.46);
+  --color-surface-2: rgba(15, 30, 60, 0.58);
+
+  --color-text-primary: #e6f4ff;
+  --color-text-secondary: #7eb8ff;
+  --color-text-tertiary: #3a6fb0;
+  --color-text-inverse: #050a15;
+
+  --color-accent: #00d4ff;
+  --color-accent-hover: #40e0ff;
+  --color-accent-light: #7b61ff;
+  --color-accent-text: #031420;
+
+  --color-border: rgba(0, 212, 255, 0.24);
+  --color-border-light: rgba(0, 212, 255, 0.11);
+  --color-border-focus: #00d4ff;
+
+  --color-success: #2ee6a8;
+  --color-success-light: rgba(46, 230, 168, 0.12);
+  --color-warning: #ffd166;
+  --color-warning-light: rgba(255, 209, 102, 0.12);
+  --color-danger: #ff6b8a;
+  --color-danger-light: rgba(255, 107, 138, 0.12);
+  --color-info: #00d4ff;
+  --color-info-light: rgba(0, 212, 255, 0.12);
+
+  --shadow-sm: 0 0 12px rgba(0, 212, 255, 0.08);
+  --shadow-md: 0 0 20px rgba(0, 212, 255, 0.12);
+  --shadow-lg: 0 0 34px rgba(0, 212, 255, 0.16);
+
+  /* 分类图表色（全息色系；图表须另配数值/标签/纹理，不得只靠颜色）*/
+  --chart-1: #00d4ff;
+  --chart-2: #7b61ff;
+  --chart-3: #40e0ff;
+  --chart-4: #a78bfa;
+  --chart-5: #22d3ee;
+  --chart-6: #818cf8;
+  --chart-7: #38bdf8;
+  --chart-8: #67e8f9;
+  --chart-axis: #3a6fb0;
+  --chart-text: #7eb8ff;
+  --chart-grid: rgba(0, 212, 255, 0.1);
+  --chart-glow: rgba(0, 212, 255, 0.5);
+
+  --data-font: var(--font-mono);
+  --data-num-weight: var(--font-weight-semibold);
+
+  /* B1.4 Review Data 令牌：语义数据色 + 网格 */
+  --data-blue: #5AB0F2;
+  --data-green: #4ECB8D;
+  --data-yellow: #E5B454;
+  --data-red: #E5696B;
+  --data-violet: #A78BFA;
+  --data-grid: rgba(255, 255, 255, 0.04);
+
+  /* A3.4 Review Data 密度（紧密）：严格降序 L1>L2>L2.5>L3>L4>L5 */
+  --space-l1: 28px;
+  --space-l2: 14px;
+  --space-l25: 12px;
+  --space-l3: 8px;
+  --space-l4: 6px;
+  --space-l5: 3px;
+}
+
+/* ============================================================
+   6. 基础元素（body / 焦点 / 减少动效）
+   ============================================================ */
+body {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  /* 主题切换时的平滑过渡（按元素声明，不采用全局 * transition） */
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--color-accent-hover);
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  padding: 8px 12px;
+  transition: border-color var(--transition-fast);
+}
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-border-focus);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 1px;
+  border-radius: inherit;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   7. 材质系统（Material System）
+   半透明 + 模糊只在关键 Surface 使用；不支持 backdrop-filter 时
+   提高背景不透明度并关闭 blur。
+   ============================================================ */
+
+/* 材质表面：半透明 + 背板模糊（Fluent / F 关键面板）*/
+.material-surface {
+  background: var(--color-surface);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* 不支持 backdrop-filter 时的降级 */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .material-surface {
+    background: var(--color-surface-2);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* F 全息面板：透明 + 模糊 + 发光边缘 + 内光 */
+.holo-panel {
+  background: var(--color-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+.holo-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 212, 255, 0.08),
+    transparent 40%,
+    transparent 60%,
+    rgba(123, 97, 255, 0.08)
+  );
+}
+
+/* ============================================================
+   8. 容器系统（Section / List / Panel / Card / Data Block）
+   原则：不「全卡片化」，按语义选择容器。
+   ============================================================ */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.section + .section {
+  margin-top: var(--space-6);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-2);
+  border-bottom: var(--border-width) solid var(--color-border-light);
+  transition: background var(--transition-fast);
+}
+.list-item:last-child {
+  border-bottom: none;
+}
+.list-item:hover {
+  background: var(--color-surface-2);
+}
+
+.panel {
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+}
+
+.card {
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-normal), transform var(--transition-normal);
+}
+.card.is-interactive:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+.card.is-interactive:active {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(0);
+}
+
+.data-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.data-block__value {
+  font-family: var(--data-font, var(--font-sans));
+  font-size: var(--font-size-2xl);
+  font-weight: var(--data-num-weight, var(--font-weight-semibold));
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.data-block__label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+.data-block__delta {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+.data-block__delta[data-tone='up'] {
+  color: var(--color-success);
+}
+.data-block__delta[data-tone='down'] {
+  color: var(--color-danger);
+}
+
+/* ============================================================
+   8.5 Surface 六层语义类（契约 A2.2 / A2.3 / A3.2）
+   谱系：Plane 环境 → Section 语义 → Panel 功能 → Card 对象
+         → Floating 前景 → Overlay 临时控制
+   与旧 .section / .panel / .card 并存，向后兼容；新代码优先使用语义类。
+   ============================================================ */
+/* Plane · 环境层：无边框 / 阴影 / 滚动 / 选中 / 拖拽 */
+.surface-plane {
+  display: block;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* Section · 语义分区：无默认背景框 / 圆角 / 阴影 */
+.surface-section {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Panel · 独立功能模块：唯一带独立边界的容器，padding 24px（紧凑 16px）*/
+.surface-panel {
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  min-height: 120px;
+}
+.surface-panel--compact {
+  padding: var(--space-4);
+}
+
+/* Card · 对象：padding 16px（紧凑 12px），min-height 48px */
+.surface-card {
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-sm);
+  min-height: 48px;
+}
+.surface-card--compact {
+  padding: var(--space-3);
+}
+
+/* Floating · 前景状态：脱离原空间，最大宽 Canvas 80% */
+.surface-floating {
+  position: relative;
+  z-index: 40;
+  max-width: 80%;
+  box-shadow: var(--shadow-lg);
+}
+
+/* Overlay · 临时控制层：独立于页面布局流 */
+.surface-overlay {
+  position: fixed;
+  z-index: 100;
+}
+
+/* SectionBoundaryRule（A1.3）：actual_gap = max(semantic, content)。
+   语义层 L1、内容层 L2 → 实际取 L1，禁止 L1+L2 叠加。 */
+.section-boundary {
+  margin-top: var(--space-l1);
+}
+
+/* ============================================================
+   9. 状态系统
+   ============================================================ */
+.is-disabled,
+[aria-disabled='true'],
+:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  color: transparent !important;
+  user-select: none;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, var(--color-surface), transparent);
+  animation: skeleton-shimmer 1.4s infinite;
+}
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+  color: var(--color-text-secondary);
+}
+.empty-state__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.state-success {
+  color: var(--color-success);
+}
+.state-error {
+  color: var(--color-danger);
+}
+.state-warning {
+  color: var(--color-warning);
+}
+
+.is-saving {
+  opacity: 0.65;
+  pointer-events: none;
+}
+.saved-flash {
+  animation: saved-flash 1.2s ease;
+}
+@keyframes saved-flash {
+  0% {
+    color: var(--color-success);
+  }
+  100% {
+    color: inherit;
+  }
+}
+
+/* ============================================================
+   10. 动效工具类（有意义才动；reduced-motion 已在 §6 全局压平）
+   ============================================================ */
+.motion-page-enter {
+  animation: motion-page-enter var(--transition-normal) var(--ease-out-soft) both;
+}
+@keyframes motion-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.motion-task-done {
+  animation: motion-task-done var(--transition-fast) var(--ease-out-soft);
+}
+@keyframes motion-task-done {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.motion-data-change {
+  animation: motion-data-change var(--transition-slow) var(--ease-out-soft);
+}
+@keyframes motion-data-change {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* F 数据脉冲（Data Pulse）*/
+.motion-data-pulse {
+  animation: motion-data-pulse 2.4s ease-in-out infinite;
+}
+@keyframes motion-data-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.flashcard-face {
+  backface-visibility: hidden;
+  transition: transform var(--transition-slow) var(--ease-out-soft);
+  transform-style: preserve-3d;
+}
+
+/* ============================================================
+   11. 主题专属材质类（Theme Material Classes）
+   依据：V8_VISUAL_LAB_4THEMES_INTERACTIONS 模板
+   四个主题各自拥有独立的材质组合，不是「换色」。这些类供页面/组件
+   按主题挂载，让同一语义组件在不同空间里呈现不同材质。
+   ============================================================ */
+
+/* ---- A 晨雾书房 · 纸页材质 ---- */
+[data-theme='mist'] .mist-paper {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.74),
+    rgba(249, 244, 236, 0.72)
+  );
+  border: 1px solid rgba(100, 80, 55, 0.06);
+  box-shadow:
+    0 1px 2px rgba(85, 65, 45, 0.03),
+    0 10px 28px rgba(85, 65, 45, 0.045);
+}
+[data-theme='mist'] .paper-strip {
+  border-left: 3px solid rgba(201, 184, 154, 0.72);
+  padding-left: 14px;
+}
+
+/* ---- C Windows Fluent · 窗口 / 浮层材质 ---- */
+[data-theme='fluent'] .fluent-window {
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 28px;
+  box-shadow:
+    0 14px 44px rgba(35, 65, 130, 0.12),
+    0 2px 8px rgba(35, 65, 130, 0.06),
+    inset 0 1px rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+}
+[data-theme='fluent'] .fluent-float {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 22px;
+  box-shadow:
+    0 18px 48px rgba(35, 65, 130, 0.14),
+    inset 0 1px rgba(255, 255, 255, 0.82);
+}
+[data-theme='fluent'] .fluent-toolbar {
+  background: rgba(255, 255, 255, 0.34);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.44);
+}
+
+/* ---- D 深色夜航 · 深空舞台 / 焦点 ---- */
+[data-theme='night'] .night-stage {
+  background:
+    radial-gradient(circle at 50% -20%, rgba(82, 90, 150, 0.16), transparent 48%),
+    linear-gradient(180deg, rgba(18, 22, 34, 0.35), rgba(8, 10, 15, 0.12));
+}
+[data-theme='night'] .night-focus {
+  border-color: rgba(255, 255, 255, 0.07);
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.3),
+    inset 0 1px rgba(255, 255, 255, 0.02);
+}
+[data-theme='night'] .night-pulse {
+  box-shadow: 0 0 0 4px rgba(124, 110, 255, 0.08);
+}
+
+/* ---- F 数据驾驶舱 · 全息面板 / Hero / 指标芯片 ---- */
+.review-space {
+  position: relative;
+  border: 1px solid rgba(0, 212, 255, 0.16);
+  border-radius: 28px;
+  padding: 26px;
+  overflow: hidden;
+  background:
+    linear-gradient(140deg, rgba(10, 35, 58, 0.32), rgba(4, 13, 25, 0.14)),
+    rgba(4, 10, 20, 0.16);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.26),
+    inset 0 0 60px rgba(0, 190, 255, 0.035);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.holo-panel {
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 22px;
+  background: rgba(7, 22, 40, 0.38);
+  box-shadow:
+    0 0 24px rgba(0, 170, 255, 0.06),
+    inset 0 0 30px rgba(0, 160, 255, 0.035);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.holo-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 30px;
+  border: 1px solid rgba(0, 212, 255, 0.28);
+  border-radius: 26px;
+  background: linear-gradient(
+    140deg,
+    rgba(13, 55, 83, 0.42),
+    rgba(6, 18, 33, 0.25) 60%,
+    rgba(24, 12, 70, 0.24)
+  );
+  box-shadow:
+    0 0 0 1px rgba(0, 212, 255, 0.025),
+    0 0 46px rgba(0, 175, 255, 0.08),
+    inset 0 0 45px rgba(0, 175, 255, 0.045);
+  backdrop-filter: blur(24px) saturate(130%);
+  -webkit-backdrop-filter: blur(24px) saturate(130%);
+}
+.metric-chip {
+  padding: 12px;
+  border: 1px solid rgba(0, 212, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(8, 28, 47, 0.3);
+}
+
+/* ============================================================
+   12. 主题专属交互层（Theme Interaction Language）
+   依据：V8_VISUAL_LAB_4THEMES_INTERACTIONS 模板
+   四主题各自有独立的 hover 反馈语言，不做「统一浮起 + 发光」。
+   机制：JS 给可交互元素挂 .theme-interactive 与 .is-hovered，
+   兼容桌面鼠标 / 精确指针；列表行用轻反馈，不重度浮起。
+   ============================================================ */
+.theme-interactive {
+  position: relative;
+  transform: translateZ(0);
+  transition:
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 260ms ease,
+    background 260ms ease,
+    border-color 260ms ease,
+    box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* RF：不常驻 will-change，避免大量元素各建合成层；仅交互态启用 */
+  will-change: auto;
+}
+
+.theme-interactive.is-hovered,
+.theme-interactive.is-active {
+  will-change: transform, filter, box-shadow;
+}
+
+/* 轻量交互变体：给按钮/输入/下拉等高频小元素用，不做明显浮起位移 */
+.theme-interactive--subtle { will-change: auto; }
+
+[data-theme='mist'] .theme-interactive--subtle.is-hovered {
+  transform: none;
+  filter: saturate(1.06) brightness(1.03);
+}
+
+[data-theme='fluent'] .theme-interactive--subtle.is-hovered {
+  transform: none;
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.88);
+}
+
+[data-theme='night'] .theme-interactive--subtle.is-hovered {
+  transform: none;
+  background: rgba(35, 40, 57, 0.9);
+}
+
+[data-scope='review-data'] .theme-interactive--subtle.is-hovered,
+[data-visual-scope='review-data'] .theme-interactive--subtle.is-hovered {
+  transform: none;
+  border-color: rgba(0, 212, 255, 0.48);
+}
+
+/* ---- A 晨雾书房 · 晨光照亮纸页 ---- */
+[data-theme='mist'] .theme-interactive.is-hovered {
+  filter: saturate(1.1) brightness(1.035);
+  transform: translateY(-2px);
+  border-color: rgba(171, 139, 95, 0.22);
+  box-shadow:
+    0 12px 30px rgba(78, 58, 38, 0.075),
+    0 0 0 1px rgba(201, 184, 154, 0.07),
+    inset 0 1px rgba(255, 255, 255, 0.55);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.93), rgba(251, 246, 237, 0.88));
+}
+[data-theme='mist'] .theme-interactive.is-hovered::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -28%;
+  width: 24%;
+  pointer-events: none;
+  transform: skewX(-18deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 227, 177, 0.34), transparent);
+  animation: mist-light-sweep 720ms ease-out forwards;
+  border-radius: inherit;
+}
+@keyframes mist-light-sweep {
+  from { left: -28%; opacity: 0; }
+  18% { opacity: 1; }
+  to { left: 115%; opacity: 0; }
+}
+
+/* ---- C Windows Fluent · 浮起 + Acrylic 加深 ---- */
+[data-theme='fluent'] .theme-interactive.is-hovered {
+  transform: translateY(-7px) scale(1.012);
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.88);
+  box-shadow:
+    0 28px 60px rgba(28, 60, 125, 0.17),
+    0 4px 14px rgba(28, 60, 125, 0.08),
+    inset 0 1px rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(30px) saturate(155%);
+  -webkit-backdrop-filter: blur(30px) saturate(155%);
+}
+[data-theme='fluent'] .theme-interactive.is-hovered::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.28),
+    transparent 32%,
+    transparent 68%,
+    rgba(130, 180, 255, 0.08)
+  );
+}
+[data-theme='fluent'] .list-item.theme-interactive.is-hovered {
+  transform: translateX(5px);
+  background: rgba(255, 255, 255, 0.34);
+  box-shadow: inset 3px 0 rgba(91, 141, 239, 0.44);
+}
+
+/* ---- D 深色夜航 · 月光掠过 + 聚焦 ---- */
+[data-theme='night'] .theme-interactive.is-hovered {
+  transform: translateY(-3px);
+  background: rgba(35, 40, 57, 0.9);
+  border-color: rgba(160, 148, 255, 0.22);
+  box-shadow:
+    0 16px 38px rgba(0, 0, 0, 0.34),
+    0 0 0 1px rgba(124, 110, 255, 0.04),
+    inset 0 1px rgba(255, 255, 255, 0.028);
+}
+[data-theme='night'] .theme-interactive.is-hovered::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -38%;
+  width: 34%;
+  pointer-events: none;
+  transform: skewX(-18deg);
+  background: linear-gradient(90deg, transparent, rgba(189, 199, 255, 0.065), transparent);
+  animation: night-moon-sweep 900ms ease-out forwards;
+  border-radius: inherit;
+}
+@keyframes night-moon-sweep {
+  from { left: -38%; opacity: 0; }
+  15% { opacity: 1; }
+  to { left: 115%; opacity: 0; }
+}
+[data-theme='night'] .night-focus-zone:has(.theme-interactive.is-hovered)
+  .theme-interactive:not(.is-hovered) {
+  opacity: 0.76;
+  filter: saturate(0.88) brightness(0.93);
+}
+
+/* ---- F 数据驾驶舱 · 浮起 + 点亮 + 数据响应 ---- */
+[data-scope='review-data'] .theme-interactive.is-hovered,
+[data-visual-scope='review-data'] .theme-interactive.is-hovered {
+  transform: translateY(-8px) scale(1.012);
+  border-color: rgba(0, 212, 255, 0.48);
+  box-shadow:
+    0 0 44px rgba(0, 212, 255, 0.17),
+    0 24px 58px rgba(0, 0, 0, 0.3),
+    inset 0 0 38px rgba(0, 180, 255, 0.085);
+  background: linear-gradient(145deg, rgba(12, 43, 68, 0.54), rgba(6, 17, 31, 0.38));
+}
+[data-scope='review-data'] .theme-interactive.is-hovered::after,
+[data-visual-scope='review-data'] .theme-interactive.is-hovered::after {
+  content: '';
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  top: 0;
+  height: 2px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 212, 255, 0.98),
+    rgba(123, 97, 255, 0.88),
+    transparent
+  );
+  box-shadow:
+    0 0 14px rgba(0, 212, 255, 0.55),
+    0 0 24px rgba(123, 97, 255, 0.22);
+}
+[data-scope='review-data'] .list-item.theme-interactive.is-hovered,
+[data-visual-scope='review-data'] .list-item.theme-interactive.is-hovered {
+  transform: translateX(4px);
+  background: linear-gradient(90deg, rgba(0, 212, 255, 0.065), transparent 70%);
+  box-shadow: inset 3px 0 rgba(0, 212, 255, 0.42);
+}
+
+/* ---- 交互可见性 + 纯 CSS hover 兜底 ---- */
+.theme-interactive:hover {
+  z-index: 4;
+  /* 兜底：即使 JS 未挂 .is-hovered（如 WebView 事件异常），hover 也有基础浮起反馈 */
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ---- 减少动效 ---- */
+@media (prefers-reduced-motion: reduce) {
+  .theme-interactive,
+  .theme-interactive.is-hovered {
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* 旧 token 别名已移除（Phase 15 清理完成），页面/组件统一使用 --color-* 命名。 */

@@ -1,0 +1,299 @@
+/* ============================================================
+   RecurringPage — 周期计划
+   ============================================================ */
+
+.page {
+  max-width: 1080px;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--color-text-tertiary);
+  font-size: 14px;
+}
+
+/* ---- List ---- */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.cardInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 8px;
+  line-height: 1.4;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ruleDesc {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.timeInfo {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+}
+
+.dateRange {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+.cardDesc {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* ---- Toggle Switch ---- */
+
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggleSlider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
+
+.toggleSlider::before {
+  content: '';
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  background: var(--color-text-tertiary);
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+}
+
+.toggle input:checked + .toggleSlider {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.toggle input:checked + .toggleSlider::before {
+  transform: translateX(20px);
+  background: #fff;
+}
+
+/* ---- Generate Preview ---- */
+
+.generatePreview {
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border-light);
+  font-size: 13px;
+}
+
+.willGenerate {
+  color: var(--color-success);
+}
+
+.wontGenerate {
+  color: var(--color-text-tertiary);
+}
+
+/* ---- Form ---- */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formRow {
+  display: flex;
+  gap: 16px;
+}
+
+.formRow .formGroup {
+  flex: 1;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.input {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color var(--transition-fast);
+  font-family: inherit;
+}
+
+.input:focus {
+  border-color: var(--color-border-focus);
+}
+
+.textarea {
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color var(--transition-fast);
+  font-family: inherit;
+  resize: vertical;
+}
+
+.textarea:focus {
+  border-color: var(--color-border-focus);
+}
+
+/* ---- Radio Group ---- */
+
+.radioGroup {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.radio {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.radio input {
+  accent-color: var(--color-accent);
+}
+
+/* ---- Checkbox Chips ---- */
+
+.checkboxGroup {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.checkboxChip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.checkboxChip:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.checkboxChipActive {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.checkboxChip input {
+  display: none;
+}
+
+/* ---- Checkbox Label ---- */
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.checkboxLabel input {
+  accent-color: var(--color-accent);
+}
+
+/* ---- Form Actions ---- */
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 4px;
+}

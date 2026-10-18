@@ -1,0 +1,326 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 720px;
+}
+
+.section {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.sectionHeader {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sectionTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.sectionDesc {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 4px 0 0;
+}
+
+.sectionBody {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Theme */
+.themeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.themeLabel {
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
+.themeToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.themeOption {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: 2px solid transparent;
+}
+
+.themeOption:hover {
+  background: var(--color-surface-2);
+}
+
+.themeOptionActive {
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.timeInput {
+  padding: 5px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  outline: none;
+}
+
+.timeInput:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.timeInput:focus {
+  border-color: var(--color-accent);
+}
+
+/* Shortcuts */
+.shortcutList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.shortcutRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+
+.shortcutRow:hover {
+  background: var(--color-surface-2);
+}
+
+.shortcutLabel {
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
+.shortcutKeys {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.keyChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-width: 28px;
+  justify-content: center;
+}
+
+.keyChip:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+.keyChipRecording {
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.recordingHint {
+  font-size: 12px;
+  color: var(--color-accent);
+  margin-left: 8px;
+}
+
+.resetBtn {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  align-self: flex-start;
+  margin-top: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.resetBtn:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+/* Data Export / Import / Backup */
+.dataActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.warningText {
+  font-size: 13px;
+  color: var(--color-warning);
+  margin: 12px 0 0;
+  line-height: 1.5;
+}
+
+/* Backup */
+.backupInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.backupRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.backupLabel {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.backupValue {
+  font-size: 13px;
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+/* Import Preview Modal */
+.importPreview {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.importSummary {
+  font-size: 14px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.importGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.importChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+/* Form actions (used in modals) */
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* Clear Data Modal */
+.clearConfirm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.clearWarning {
+  font-size: 14px;
+  color: var(--color-danger);
+  margin: 0;
+  font-weight: 500;
+}
+
+.clearHint {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* About */
+.aboutContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.aboutRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.aboutLabel {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.aboutValue {
+  font-size: 13px;
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Danger zone */
+.dangerZone {
+  border-color: var(--color-danger);
+}
+
+.dangerZone .sectionHeader {
+  border-bottom-color: var(--color-danger-light);
+}
+
+.dangerTitle {
+  color: var(--color-danger);
+}

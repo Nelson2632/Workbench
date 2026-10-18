@@ -1,0 +1,310 @@
+.page {
+  padding: 0 24px 24px;
+}
+
+.loading {
+  text-align: center;
+  color: var(--color-text-tertiary);
+  padding: 48px 0;
+  font-size: 14px;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.weakToggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.weakToggle input {
+  accent-color: var(--color-accent);
+}
+
+/* Tree */
+.tree {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.subjectCard {
+  padding: 0;
+  overflow: hidden;
+}
+
+.subjectHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+}
+
+.subjectToggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--color-text-primary);
+  flex: 1;
+}
+
+.subjectName {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.countBadge {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  background: var(--color-surface-2);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.subjectActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chevron {
+  display: inline-block;
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+  transition: transform var(--transition-normal);
+  width: 12px;
+  text-align: center;
+}
+
+.chevronOpen {
+  transform: rotate(90deg);
+}
+
+/* Chapter list */
+.chapterList {
+  border-top: 1px solid var(--color-border-light);
+  padding: 12px 20px 16px 32px;
+  background: var(--color-surface-2);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chapterItem {
+  border-radius: var(--radius-sm);
+}
+
+.chapterHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.chapterHeader:hover {
+  background: var(--color-surface-2);
+}
+
+.chapterToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--color-text-primary);
+  flex: 1;
+}
+
+.chapterName {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.chapterCount {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+.chapterActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Topic list */
+.topicList {
+  margin-left: 28px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.emptyTopic {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  padding: 8px 12px;
+}
+
+.topicItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+}
+
+.topicItem:hover {
+  border-color: var(--color-border);
+}
+
+.topicInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.topicName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.topicBadges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.masteryBadge {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.lastReview {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+.topicActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+/* Inline add */
+.inlineAdd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.inlineInput {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 13px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.inlineInput:focus {
+  border-color: var(--color-border-focus);
+}
+
+.addChapterBtn {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-accent);
+  background: none;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background var(--transition-fast);
+}
+
+.addChapterBtn:hover {
+  background: var(--color-surface-2);
+}
+
+/* Form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.input {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.input:focus {
+  border-color: var(--color-border-focus);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.flashcardInfo {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  text-align: center;
+  padding: 8px 0;
+}

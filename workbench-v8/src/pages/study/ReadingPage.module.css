@@ -1,0 +1,248 @@
+.page {
+  padding: 0 24px 24px;
+}
+
+.loading {
+  text-align: center;
+  color: var(--color-text-tertiary);
+  padding: 48px 0;
+  font-size: 14px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  padding: 20px;
+  position: relative;
+}
+
+.pinned {
+  border: 1px solid var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent-light);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.titleRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pinIcon {
+  font-size: 14px;
+}
+
+.completeBadge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-success);
+  background: var(--color-success-light);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  width: fit-content;
+}
+
+/* Status badge */
+.statusBadge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  width: fit-content;
+}
+
+.statusWant {
+  color: var(--color-info, #2f80ed);
+  background: var(--color-info-light, #eaf2ff);
+}
+
+.statusReading {
+  color: var(--color-accent);
+  background: var(--color-accent-light);
+}
+
+.statusRead {
+  color: var(--color-success);
+  background: var(--color-success-light);
+}
+
+.statusDropped {
+  color: var(--color-text-tertiary);
+  background: var(--color-surface-2);
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+/* Progress */
+.progressSection {
+  margin-bottom: 14px;
+}
+
+.progressBar {
+  height: 10px;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-normal);
+  min-width: 2px;
+}
+
+.progressComplete {
+  background: var(--color-success);
+}
+
+.progressInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.progressText {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.progressPercent {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+/* Step controls */
+.stepControls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* Note */
+.note {
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* Form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.input {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.input:focus {
+  border-color: var(--color-border-focus);
+}
+
+.textarea {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  transition: border-color var(--transition-fast);
+}
+
+.textarea:focus {
+  border-color: var(--color-border-focus);
+}
+
+.pinLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.pinLabel input {
+  accent-color: var(--color-accent);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+@media (max-width: 500px) {
+  .formRow {
+    grid-template-columns: 1fr 1fr;
+  }
+}

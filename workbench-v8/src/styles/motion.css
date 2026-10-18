@@ -1,0 +1,216 @@
+/* ============================================================
+   Personal Workbench V8 — Phase 16.5 Motion Enhancement
+   四主题专属交互动画（同一组件在不同主题拥有不同「性格」）
+
+   原则：
+   - 不做统一 hover；hover/active/focus 反馈按主题分别定义
+   - shadow / filter / backdrop-filter 仅在交互态（hover/active/focus）启用
+   - 无限循环仅使用 transform / opacity（GPU 廉价），粒子数量 < 10
+   - prefers-reduced-motion 下关闭全部动画
+   ============================================================ */
+
+/* ============================================================
+   1. 页面进入动画（按主题）
+   ============================================================ */
+
+/* Mist · 像打开书：opacity + 轻微上浮 */
+[data-theme='mist'] .anim-page-enter {
+  animation: mist-page-enter var(--transition-normal) var(--ease-out-soft) both;
+}
+@keyframes mist-page-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Fluent · 像窗口打开：scale 展开 */
+[data-theme='fluent'] .anim-page-enter {
+  animation: fluent-page-enter var(--transition-normal) var(--ease-out-soft) both;
+}
+@keyframes fluent-page-enter {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Night · 像进入夜空：fade + blur 解除 */
+[data-theme='night'] .anim-page-enter {
+  animation: night-page-enter 360ms ease both;
+}
+@keyframes night-page-enter {
+  from { opacity: 0; filter: blur(6px); }
+  to   { opacity: 1; filter: blur(0); }
+}
+
+/* Review Cockpit · 像系统启动：背景亮起 → 浮现 */
+[data-visual-scope='review-data'] .anim-page-enter,
+[data-scope='review-data'] .anim-page-enter {
+  animation: cockpit-page-enter 600ms var(--ease-out-soft) both;
+}
+@keyframes cockpit-page-enter {
+  0%   { opacity: 0; transform: translateY(6px); }
+  35%  { opacity: 0.35; }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   2. 交互状态（active / focus，按主题）
+   ============================================================ */
+
+/* Mist · 纸页轻压 + 输入框淡金描边 */
+[data-theme='mist'] .theme-interactive:active,
+[data-theme='mist'] .theme-interactive.is-active {
+  transform: translateY(0) scale(0.99);
+  box-shadow: var(--shadow-sm);
+}
+[data-theme='mist'] input:focus,
+[data-theme='mist'] textarea:focus {
+  border-color: #b8a687;
+  box-shadow: 0 0 0 3px rgba(201, 184, 154, 0.28);
+}
+
+/* Fluent · 点击压下（Windows 控件手感） */
+[data-theme='fluent'] .theme-interactive:active,
+[data-theme='fluent'] .theme-interactive.is-active {
+  transform: scale(0.96);
+}
+
+/* Night · 按压聚焦 */
+[data-theme='night'] .theme-interactive:active,
+[data-theme='night'] .theme-interactive.is-active {
+  transform: translateY(0) scale(0.985);
+  border-color: rgba(124, 110, 255, 0.35);
+}
+
+/* Review · 按压点亮 */
+[data-visual-scope='review-data'] .theme-interactive:active,
+[data-scope='review-data'] .theme-interactive:active,
+[data-visual-scope='review-data'] .theme-interactive.is-active,
+[data-scope='review-data'] .theme-interactive.is-active {
+  border-color: rgba(0, 212, 255, 0.6);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.22);
+}
+
+/* ============================================================
+   3. 侧栏激活指示条（四主题通用，RF：B6）
+   用法：给导航项挂 .nav-indicator，激活项由 NavLink 自带
+   aria-current="page"。指示条以 scaleY 平滑滑入，不瞬间切换。
+   兼容别名 .fluent-indicator（旧用法，等价）。
+   ============================================================ */
+.nav-indicator,
+.fluent-indicator {
+  position: relative;
+  transition: background var(--transition-normal), padding-left var(--transition-normal);
+}
+.nav-indicator::before,
+.fluent-indicator::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 3px;
+  height: 60%;
+  transform: translateY(-50%) scaleY(0);
+  transform-origin: center;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  transition: transform var(--transition-normal) var(--ease-out-soft);
+}
+.nav-indicator:hover::before,
+.nav-indicator[aria-current='page']::before,
+.fluent-indicator:hover::before,
+.fluent-indicator[aria-current='page']::before {
+  transform: translateY(-50%) scaleY(1);
+}
+[data-theme='night'] .nav-indicator[aria-current='page']::before {
+  box-shadow: 0 0 8px var(--color-accent-light);
+}
+
+/* ============================================================
+   4. Review 数据驾驶舱 HUD
+   ============================================================ */
+
+/* 顶部扫描线（仅 transform，GPU 廉价） */
+[data-visual-scope='review-data'] .holo-panel::after,
+[data-scope='review-data'] .holo-panel::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 40%;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(0, 212, 255, 0.07), transparent);
+  animation: hud-scan 4s linear infinite;
+}
+@keyframes hud-scan {
+  0%   { transform: translateY(-120%); }
+  100% { transform: translateY(340%); }
+}
+
+/* HUD 状态标签（LIVE / SYNCED）+ 呼吸圆点 */
+.hud-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--data-font, var(--font-mono));
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+}
+.hud-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  animation: hud-breathe 2.2s ease-in-out infinite;
+}
+@keyframes hud-breathe {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
+/* 数据粒子（<10，仅 transform/opacity，可选挂载） */
+.holo-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.holo-particles span {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(0, 212, 255, 0.6);
+  animation: particle-drift var(--dur, 4s) linear infinite;
+  opacity: 0;
+}
+@keyframes particle-drift {
+  0%   { transform: translateY(0); opacity: 0; }
+  15%  { opacity: 0.9; }
+  100% { transform: translateY(-24px); opacity: 0; }
+}
+
+/* ============================================================
+   5. 减少动效（reduced-motion）
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .anim-page-enter,
+  .theme-interactive,
+  .theme-interactive.is-hovered,
+  .theme-interactive.is-active,
+  .theme-interactive.is-focus {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  [data-visual-scope='review-data'] .holo-panel::after,
+  [data-scope='review-data'] .holo-panel::after,
+  .holo-particles span,
+  .hud-dot {
+    animation: none !important;
+  }
+}

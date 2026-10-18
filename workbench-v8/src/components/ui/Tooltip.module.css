@@ -1,0 +1,56 @@
+.wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.wrapBlock {
+  display: block;
+  width: 100%;
+}
+
+.tip {
+  position: absolute;
+  z-index: 300;
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #fff;
+  background: rgba(30, 30, 35, 0.92);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: tipIn var(--transition-fast) ease;
+}
+
+.top {
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.bottom {
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.left {
+  right: calc(100% + 6px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.right {
+  left: calc(100% + 6px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+@keyframes tipIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

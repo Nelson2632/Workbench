@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="mist">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>个人工作台 V8 · Design Handoff 高保真预览</title>
+<style>
+/* ============ 内联 Design Foundation（与 design-foundation.css 同源）============ */
+:root{--color-brand:#4c6fe8;--color-brand-hover:#3855cc;--color-brand-light:#e9edfb;--color-brand-text:#fff;
+--radius-sm:6px;--radius-md:10px;--radius-lg:16px;--radius-full:9999px;
+--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-7:32px;--space-8:40px;
+--font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+--font-mono:'Cascadia Code','SF Mono',Consolas,Menlo,monospace;
+--font-size-xs:12px;--font-size-sm:13px;--font-size-base:15px;--font-size-lg:17px;--font-size-xl:20px;--font-size-2xl:26px;--font-size-3xl:32px;
+--transition-fast:140ms ease;--transition-normal:240ms ease;--transition-slow:400ms ease;--border-width:1px;}
+:root,[data-theme="mist"]{color-scheme:light;
+--color-bg:#f7f3ee;--color-surface:rgba(255,255,255,.78);--color-surface-2:rgba(250,247,242,.92);
+--color-text-primary:#2d2a26;--color-text-secondary:#6b6863;--color-text-tertiary:#9a9791;--color-text-inverse:#fff;
+--color-border:rgba(70,60,50,.08);--color-border-light:rgba(70,60,50,.045);--color-border-focus:#9c815c;
+--color-accent:#c9b89a;--color-accent-hover:#b8a687;--color-accent-light:#e6d7c0;--color-accent-text:#3b2e1c;
+--color-success:#4f8f68;--color-success-light:#e7efe8;--color-warning:#b98b3e;--color-warning-light:#f3ead7;
+--color-danger:#bc5a50;--color-danger-light:#f4e6e3;--color-info:#8a9bb0;--color-info-light:#eaeef2;
+--radius-sm:6px;--radius-md:8px;--radius-lg:12px;
+--shadow-sm:0 2px 8px rgba(65,50,35,.025);--shadow-md:0 8px 24px rgba(65,50,35,.045);--shadow-lg:0 14px 40px rgba(65,50,35,.06);}
+[data-theme="fluent"]{color-scheme:light;
+--color-bg:#eef4ff;--color-surface:rgba(255,255,255,.58);--color-surface-2:rgba(255,255,255,.72);
+--color-text-primary:#1a2035;--color-text-secondary:#5b6580;--color-text-tertiary:#8b95b0;--color-text-inverse:#fff;
+--color-border:rgba(255,255,255,.46);--color-border-light:rgba(255,255,255,.26);--color-border-focus:#3a6fd6;
+--color-accent:#5b8def;--color-accent-hover:#3a6fd6;--color-accent-light:#8ab4ff;--color-accent-text:#fff;
+--color-success:#2f9e67;--color-success-light:#dff3e9;--color-warning:#c07d18;--color-warning-light:#fcf0d8;
+--color-danger:#d4483c;--color-danger-light:#fbe6e4;--color-info:#5b8def;--color-info-light:#e6f0ff;
+--radius-sm:6px;--radius-md:12px;--radius-lg:18px;
+--shadow-sm:0 2px 6px rgba(30,60,120,.06);--shadow-md:0 8px 20px rgba(30,60,120,.09);--shadow-lg:0 18px 44px rgba(30,60,120,.12);}
+[data-theme="night"]{color-scheme:dark;
+--color-bg:#0f121a;--color-surface:rgba(30,34,48,.74);--color-surface-2:rgba(40,45,65,.84);
+--color-text-primary:#e8ebf2;--color-text-secondary:#a0a7bd;--color-text-tertiary:#6b7390;--color-text-inverse:#0f121a;
+--color-border:rgba(255,255,255,.08);--color-border-light:rgba(255,255,255,.045);--color-border-focus:#988cff;
+--color-accent:#7c6eff;--color-accent-hover:#988cff;--color-accent-light:#a79cff;--color-accent-text:#0f121a;
+--color-success:#4cc38a;--color-success-light:#12271f;--color-warning:#d9a13b;--color-warning-light:#2b2113;
+--color-danger:#e06c6c;--color-danger-light:#2b1919;--color-info:#7c6eff;--color-info-light:#1c1b33;
+--shadow-sm:0 3px 10px rgba(0,0,0,.22);--shadow-md:0 8px 22px rgba(0,0,0,.28);--shadow-lg:0 18px 42px rgba(0,0,0,.34);}
+[data-scope="review-data"],[data-visual-scope="review-data"]{color-scheme:dark;
+--color-bg:#050a15;--color-surface:rgba(10,20,40,.46);--color-surface-2:rgba(15,30,60,.58);
+--color-text-primary:#e6f4ff;--color-text-secondary:#7eb8ff;--color-text-tertiary:#3a6fb0;--color-text-inverse:#050a15;
+--color-border:rgba(0,212,255,.24);--color-border-light:rgba(0,212,255,.11);--color-border-focus:#00d4ff;
+--color-accent:#00d4ff;--color-accent-hover:#40e0ff;--color-accent-light:#7b61ff;--color-accent-text:#031420;
+--color-success:#2ee6a8;--color-success-light:rgba(46,230,168,.12);--color-warning:#ffd166;--color-warning-light:rgba(255,209,102,.12);
+--color-danger:#ff6b8a;--color-danger-light:rgba(255,107,138,.12);--color-info:#00d4ff;--color-info-light:rgba(0,212,255,.12);
+--shadow-sm:0 0 12px rgba(0,212,255,.08);--shadow-md:0 0 20px rgba(0,212,255,.12);--shadow-lg:0 0 34px rgba(0,212,255,.16);
+--chart-1:#00d4ff;--chart-2:#7b61ff;--chart-3:#40e0ff;--chart-4:#a78bfa;--chart-5:#22d3ee;--chart-6:#818cf8;--chart-7:#38bdf8;--chart-8:#67e8f9;}
+
+/* ============ 基础 ============ */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--font-sans);font-size:var(--font-size-base);line-height:1.6;background:var(--color-bg);color:var(--color-text-primary);-webkit-font-smoothing:antialiased;transition:background var(--transition-normal)}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;font-size:inherit}
+:focus-visible{outline:2px solid var(--color-border-focus);outline-offset:2px;border-radius:var(--radius-sm)}
+
+/* ============ 顶部工具栏 ============ */
+.toolbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-4);background:color-mix(in srgb,var(--color-bg) 86%,transparent);backdrop-filter:blur(10px);border-bottom:var(--border-width) solid var(--color-border-light)}
+.toolbar .brand{font-weight:700;font-size:var(--font-size-base);display:flex;align-items:center;gap:var(--space-2);margin-right:var(--space-2)}
+.logo-dot{width:10px;height:10px;border-radius:50%;background:var(--color-brand);display:inline-block}
+.toolbar .grow{flex:1}
+.seg{display:inline-flex;background:var(--color-surface-2);border-radius:var(--radius-full);padding:3px;gap:2px}
+.seg button{padding:5px 12px;border-radius:var(--radius-full);font-size:var(--font-size-sm);color:var(--color-text-secondary);transition:all var(--transition-fast)}
+.seg button.on{background:var(--color-surface);color:var(--color-text-primary);box-shadow:var(--shadow-sm);font-weight:600}
+.toolbar .hint{font-size:var(--font-size-xs);color:var(--color-text-tertiary)}
+
+/* ============ 布局：侧栏 + 主区 ============ */
+.shell{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 57px)}
+.sidebar{border-right:var(--border-width) solid var(--color-border-light);padding:var(--space-4) var(--space-3);background:var(--color-surface);display:flex;flex-direction:column;gap:var(--space-2)}
+.sidebar .group{font-size:var(--font-size-xs);color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.05em;margin:var(--space-2) 0 var(--space-1)}
+.sidebar a{display:flex;align-items:center;gap:var(--space-2);padding:8px 10px;border-radius:var(--radius-sm);color:var(--color-text-secondary);font-size:var(--font-size-sm);text-decoration:none}
+.sidebar a.active{background:var(--color-accent-light);color:var(--color-accent);font-weight:600}
+.sidebar .foot{margin-top:auto}
+.page{display:none;padding:var(--space-6) var(--space-7);max-width:1180px;margin:0 auto}
+.page.on{display:block;animation:enter var(--transition-normal) ease both}
+.page[data-scope="review-data"]{max-width:1240px;border-radius:var(--radius-lg);background:
+  radial-gradient(70% 60% at 18% 0%,rgba(0,80,160,.28),transparent 55%),
+  radial-gradient(60% 55% at 85% 18%,rgba(90,50,180,.22),transparent 55%),
+  var(--color-bg);
+  box-shadow:var(--shadow-lg);padding:var(--space-7)}
+.page[data-scope="review-data"] .card,.page[data-scope="review-data"] .panel{backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-color:var(--color-border);box-shadow:var(--shadow-md)}
+@keyframes enter{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ============ 通用组件 ============ */
+.page-head{margin-bottom:var(--space-6)}
+.page-head .eyebrow{font-size:var(--font-size-xs);color:var(--color-text-tertiary);letter-spacing:.04em}
+.page-head h1{font-size:var(--font-size-2xl);margin:var(--space-1) 0 var(--space-1);font-weight:700;line-height:1.2}
+.page-head .sub{color:var(--color-text-secondary);font-size:var(--font-size-sm)}
+.row{display:flex;gap:var(--space-4);align-items:center}
+.grow{flex:1}
+.section{margin-bottom:var(--space-6)}
+.section-title{display:flex;align-items:center;gap:var(--space-2);font-size:var(--font-size-base);font-weight:600;margin-bottom:var(--space-3)}
+.section-title .count{font-size:var(--font-size-xs);color:var(--color-text-tertiary);font-weight:500}
+.grid{display:grid;gap:var(--space-4)}
+.grid.cols-2{grid-template-columns:1fr 1fr}
+.grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.grid.cols-4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--color-surface);border:var(--border-width) solid var(--color-border-light);border-radius:var(--radius-md);padding:var(--space-4);box-shadow:var(--shadow-sm)}
+.panel{background:var(--color-surface);border:var(--border-width) solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-4)}
+.list-item{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-2);border-bottom:var(--border-width) solid var(--color-border-light)}
+.list-item:last-child{border-bottom:none}
+.list-item:hover{background:var(--color-surface-2)}
+.data-block .v{font-family:var(--font-mono);font-size:var(--font-size-2xl);font-weight:600;line-height:1.2;font-variant-numeric:tabular-nums}
+.data-block .l{font-size:var(--font-size-sm);color:var(--color-text-secondary)}
+.data-block .d{font-size:var(--font-size-xs);font-weight:500}
+.d-up{color:var(--color-success)}.d-down{color:var(--color-danger)}
+.tag{font-size:var(--font-size-xs);padding:2px 8px;border-radius:var(--radius-full);font-weight:500}
+.tag.p0{background:var(--color-danger-light);color:var(--color-danger)}
+.tag.p1{background:var(--color-warning-light);color:var(--color-warning)}
+.tag.p2{background:var(--color-surface-2);color:var(--color-text-secondary)}
+.tag.accent{background:var(--color-accent-light);color:var(--color-accent)}
+.btn{display:inline-flex;align-items:center;gap:var(--space-2);padding:8px 14px;border-radius:var(--radius-sm);font-size:var(--font-size-sm);font-weight:500;background:var(--color-surface);border:var(--border-width) solid var(--color-border);color:var(--color-text-primary);transition:all var(--transition-fast)}
+.btn:hover{border-color:var(--color-border-focus)}
+.btn.primary{background:var(--color-accent);color:var(--color-accent-text);border-color:transparent}
+.btn.primary:hover{background:var(--color-accent-hover)}
+.check{width:18px;height:18px;border-radius:var(--radius-sm);border:2px solid var(--color-border);flex-shrink:0;display:grid;place-items:center;color:#fff}
+.check.done{background:var(--color-accent);border-color:var(--color-accent)}
+.check.done::after{content:'✓';font-size:11px}
+.done-text{text-decoration:line-through;color:var(--color-text-tertiary)}
+.muted{color:var(--color-text-tertiary)}.secondary{color:var(--color-text-secondary)}
+.empty-state{display:flex;flex-direction:column;align-items:center;gap:var(--space-3);padding:var(--space-8) var(--space-4);color:var(--color-text-secondary);text-align:center}
+.empty-state .t{font-size:var(--font-size-lg);font-weight:600;color:var(--color-text-primary)}
+.bar{height:8px;border-radius:var(--radius-full);background:var(--color-surface-2);overflow:hidden}
+.bar>span{display:block;height:100%;border-radius:var(--radius-full);background:var(--color-accent)}
+
+/* ============ 图表（简化视觉，非 ECharts）============ */
+.chart{display:flex;flex-direction:column;gap:var(--space-3)}
+.chart-row{display:flex;align-items:center;gap:var(--space-3)}
+.chart-row .lbl{width:72px;font-size:var(--font-size-sm);color:var(--color-text-secondary);flex-shrink:0}
+.chart-row .bar{flex:1}
+.chart-row .val{width:44px;text-align:right;font-family:var(--font-mono);font-size:var(--font-size-sm);font-variant-numeric:tabular-nums}
+.legend{display:flex;flex-wrap:wrap;gap:var(--space-3);margin-top:var(--space-3)}
+.legend span{display:inline-flex;align-items:center;gap:6px;font-size:var(--font-size-xs);color:var(--color-text-secondary)}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.heatmap .cell{aspect-ratio:1;border-radius:6px;background:var(--color-surface-2);display:grid;place-items:center;font-family:var(--font-mono);font-size:var(--font-size-xs);color:var(--color-text-tertiary)}
+.heatmap .cell.f1{background:var(--chart-7)}
+.heatmap .cell.f2{background:var(--chart-6)}
+.heatmap .cell.f3{background:var(--chart-2)}
+.heatmap .cell.f4{background:var(--chart-1);color:#fff}
+svg.line{width:100%;height:120px}
+.axis{display:flex;justify-content:space-between;font-size:var(--font-size-xs);color:var(--color-text-tertiary);margin-top:var(--space-2)}
+
+/* ============ 闪卡 ============ */
+.fc-wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:var(--space-5)}
+.fc-progress{text-align:center;color:var(--color-text-secondary);font-size:var(--font-size-sm)}
+.fc-progress b{font-family:var(--font-mono);color:var(--color-text-primary)}
+.fc-card{position:relative;height:300px;perspective:1000px;cursor:pointer}
+.fc-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,0,0,1)}
+.fc-card.flipped .fc-inner{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--radius-lg);padding:var(--space-6);display:flex;flex-direction:column;justify-content:center;box-shadow:var(--shadow-md);border:var(--border-width) solid var(--color-border-light)}
+.fc-face.back{transform:rotateY(180deg)}
+.fc-tag{position:absolute;top:var(--space-4);left:var(--space-4);font-size:var(--font-size-xs);padding:2px 10px;border-radius:var(--radius-full);background:rgba(255,255,255,.2);backdrop-filter:blur(4px)}
+.fc-q{font-size:var(--font-size-xl);font-weight:600;line-height:1.5}
+.fc-a{font-size:var(--font-size-lg);line-height:1.7}
+/* 5 背景方向 */
+.fc-mist{background:linear-gradient(135deg,#e8eef4,#d4deea);color:#26313d}
+.fc-night{background:linear-gradient(140deg,#0d1117,#1a2740 60%,#24344f);color:#e8edf4}
+.fc-forest{background:linear-gradient(135deg,#1e3a2f,#2f5d46);color:#eaf4ee}
+.fc-amber{background:linear-gradient(135deg,#f5e7cf,#ead3ac);color:#4a3a22}
+.fc-minimal{background:var(--color-surface);color:var(--color-text-primary)}
+.fc-rating{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3)}
+.fc-rating button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:var(--space-4) var(--space-2);border-radius:var(--radius-md);background:var(--color-surface);border:var(--border-width) solid var(--color-border);transition:all var(--transition-fast);font-size:var(--font-size-sm)}
+.fc-rating button:hover{border-color:var(--color-border-focus);box-shadow:var(--shadow-sm)}
+.fc-rating button.sel{border-color:var(--color-accent);background:var(--color-accent-light)}
+.fc-rating .e{font-size:var(--font-size-xl)}
+.fc-rating .t{color:var(--color-text-secondary)}
+.fc-rating button.sel .t{color:var(--color-accent);font-weight:600}
+.fc-themes{display:flex;gap:var(--space-2);justify-content:center}
+.fc-themes .sw{width:26px;height:26px;border-radius:50%;border:2px solid var(--color-border);cursor:pointer}
+.fc-hint{text-align:center;font-size:var(--font-size-xs);color:var(--color-text-tertiary)}
+
+/* ============ 复盘 next-step ============ */
+.next-step{margin-top:var(--space-4);padding:var(--space-4);border-radius:var(--radius-md);border:1px dashed var(--color-border-focus);background:var(--color-accent-light)}
+.next-step .tt{font-weight:600;font-size:var(--font-size-sm);margin-bottom:var(--space-2);display:flex;align-items:center;gap:var(--space-2)}
+.next-step textarea{width:100%;min-height:64px;border:var(--border-width) solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-surface);padding:var(--space-3);resize:vertical;font-family:inherit}
+.next-step .actions{display:flex;gap:var(--space-2);margin-top:var(--space-2)}
+.kbd{font-family:var(--font-mono);font-size:var(--font-size-xs);background:var(--color-surface-2);border:var(--border-width) solid var(--color-border);border-bottom-width:2px;border-radius:4px;padding:1px 5px}
+
+.flag{display:inline-block;font-size:var(--font-size-xs);padding:2px 8px;border-radius:var(--radius-full);background:var(--color-warning-light);color:var(--color-warning);font-weight:600;margin-left:var(--space-2)}
+@media(max-width:768px){.shell{grid-template-columns:1fr}.sidebar{display:none}.grid.cols-3,.grid.cols-4{grid-template-columns:1fr 1fr}.grid.cols-2{grid-template-columns:1fr}.page{padding:var(--space-4)}}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <span class="brand"><span class="logo-dot"></span>个人工作台 V8 · Design Handoff</span>
+  <div class="seg" id="themeSeg">
+    <button data-theme="mist" class="on">晨雾书房</button>
+    <button data-theme="fluent">Fluent</button>
+    <button data-theme="night">深色夜航</button>
+  </div>
+  <div class="seg" id="pageSeg">
+    <button data-page="today" class="on">今日</button>
+    <button data-page="study">学习总览</button>
+    <button data-page="flashcard">闪卡</button>
+    <button data-page="week">周复盘</button>
+    <button data-page="month">月复盘</button>
+    <button data-page="exam">考试复盘</button>
+  </div>
+  <div class="grow"></div>
+  <span class="hint">复盘页自动叠加 <span class="kbd">review-data</span> 数据 scope</span>
+</div>
+
+<div class="shell">
+  <nav class="sidebar">
+    <div class="group">导航</div>
+    <a class="active">今日</a><a>计划</a><a>学习</a><a>记录</a><a>复盘</a><a>工具</a>
+    <div class="foot"><a>设置</a><a>密码本</a></div>
+  </nav>
+
+  <main>
+  <!-- ============ 今日 ============ -->
+  <section class="page on" id="page-today">
+    <div class="page-head">
+      <div class="eyebrow">2026年8月23日 · 周日</div>
+      <h1>下午好，今天做点什么？</h1>
+      <div class="sub">只关注今天：今天要做什么，今天已经做了什么。</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">今天最重要的 3 件事 <span class="count">3/3</span></div>
+      <div class="list">
+        <div class="list-item"><span class="check done"></span><span class="done-text">数学 · 完成「数列」专题卷 1 套</span><span class="grow"></span><span class="tag p0">P0</span></div>
+        <div class="list-item"><span class="check"></span><span>英语 · 背诵 40 个高频词 + 2 篇阅读</span><span class="grow"></span><span class="tag p1">P1</span></div>
+        <div class="list-item"><span class="check"></span><span>物理 · 复习「电磁感应」错题 8 道</span><span class="grow"></span><span class="tag p1">P1</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">今日计划 <span class="count">5 项 · 完成 2</span></div>
+      <div class="list">
+        <div class="list-item"><span class="check done"></span><span class="done-text">背单词 40 个</span><span class="grow"></span><span class="muted">08:30</span></div>
+        <div class="list-item"><span class="check done"></span><span class="done-text">晨间复盘回顾</span><span class="grow"></span><span class="muted">09:00</span></div>
+        <div class="list-item"><span class="check"></span><span>数学数列专题卷</span><span class="grow"></span><span class="muted">14:00</span></div>
+        <div class="list-item"><span class="check"></span><span>英语阅读 2 篇</span><span class="grow"></span><span class="muted">16:00</span></div>
+        <div class="list-item"><span class="check"></span><span>物理错题整理</span><span class="grow"></span><span class="muted">19:30</span></div>
+      </div>
+    </div>
+
+    <div class="grid cols-4">
+      <div class="card"><div class="data-block"><div class="l">今日学习</div><div class="v">1.5<span style="font-size:var(--font-size-base)">h</span></div><div class="d d-up">▲ +0.5h</div></div></div>
+      <div class="card"><div class="data-block"><div class="l">专注次数</div><div class="v">3</div><div class="d secondary">番茄钟</div></div></div>
+      <div class="card"><div class="data-block"><div class="l">待办完成</div><div class="v">2/5</div><div class="d secondary">40%</div></div></div>
+      <div class="card"><div class="data-block"><div class="l">待复习闪卡</div><div class="v">26</div><div class="d d-down">▲ 今日到期</div></div></div>
+    </div>
+
+    <div class="section">
+      <div class="card">
+        <div class="row">
+          <div>
+            <div class="section-title" style="margin:0">今晚复盘</div>
+            <div class="sub" style="font-size:var(--font-size-sm)">睡前 3 分钟，回顾今天并形成明天调整。</div>
+          </div>
+          <div class="grow"></div>
+          <button class="btn primary">开始今日复盘 <span class="kbd">Ctrl+Shift+R</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="panel">
+        <div class="section-title" style="margin:0">空状态示例 · 今日无安排</div>
+        <div class="empty-state">
+          <div class="t">今天还没有安排</div>
+          <div>从收件箱或快速备忘开始，记下今天要做的第一件事。</div>
+          <button class="btn primary">新建任务 <span class="kbd">Ctrl+Shift+T</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 学习总览 ============ -->
+  <section class="page" id="page-study">
+    <div class="page-head">
+      <div class="eyebrow">学习</div>
+      <h1>学习总览</h1>
+      <div class="sub">本周学习概览，避免信息墙，聚焦薄弱项与下一步。</div>
+    </div>
+
+    <div class="grid cols-3">
+      <div class="card"><div class="data-block"><div class="l">本周学习时长</div><div class="v">12.5<span style="font-size:var(--font-size-base)">h</span></div><div class="d d-up">▲ 较上周 +2.1h</div></div></div>
+      <div class="card"><div class="data-block"><div class="l">掌握度</div><div class="v">72<span style="font-size:var(--font-size-base)">%</span></div><div class="d secondary">需巩固 3 个知识点</div></div></div>
+      <div class="card"><div class="data-block"><div class="l">待复习闪卡</div><div class="v">26</div><div class="d d-down">▲ 今日到期</div></div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">本周学科分布</div>
+      <div class="card">
+        <div class="chart">
+          <div class="chart-row"><span class="lbl">数学</span><div class="bar"><span style="width:34%;background:var(--chart-1,var(--color-accent))"></span></div><span class="val">4.3h</span></div>
+          <div class="chart-row"><span class="lbl">英语</span><div class="bar"><span style="width:26%;background:var(--chart-2,var(--color-success))"></span></div><span class="val">3.2h</span></div>
+          <div class="chart-row"><span class="lbl">物理</span><div class="bar"><span style="width:22%;background:var(--chart-3,var(--color-warning))"></span></div><span class="val">2.8h</span></div>
+          <div class="chart-row"><span class="lbl">化学</span><div class="bar"><span style="width:14%;background:var(--chart-4,#8b7ce8)"></span></div><span class="val">1.7h</span></div>
+          <div class="chart-row"><span class="lbl">生物</span><div class="bar"><span style="width:8%;background:var(--chart-6,#5cc0d6)"></span></div><span class="val">1.0h</span></div>
+        </div>
+        <div class="legend"><span><i style="background:var(--chart-1,var(--color-accent))"></i>数学</span><span><i style="background:var(--chart-2,var(--color-success))"></i>英语</span><span><i style="background:var(--chart-3,var(--color-warning))"></i>物理</span><span><i style="background:var(--chart-4,#8b7ce8)"></i>化学</span></div>
+      </div>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="panel">
+        <div class="section-title">薄弱知识点 <span class="count">3</span></div>
+        <div class="list">
+          <div class="list-item"><span class="tag accent">数学</span><span>数列 · 错位相减</span><span class="grow"></span><button class="btn" style="padding:4px 10px">去巩固</button></div>
+          <div class="list-item"><span class="tag accent">物理</span><span>电磁感应 · 楞次定律</span><span class="grow"></span><button class="btn" style="padding:4px 10px">去巩固</button></div>
+          <div class="list-item"><span class="tag accent">英语</span><span>非谓语动词</span><span class="grow"></span><button class="btn" style="padding:4px 10px">去巩固</button></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="section-title">最近错题 <span class="count">4</span></div>
+        <div class="list">
+          <div class="list-item"><span class="tag p0">粗心</span><span>数列求和漏项</span><span class="grow"></span><span class="muted">昨天</span></div>
+          <div class="list-item"><span class="tag p1">概念</span><span>楞次定律方向判断</span><span class="grow"></span><span class="muted">2 天前</span></div>
+          <div class="list-item"><span class="tag p1">概念</span><span>虚拟语气</span><span class="grow"></span><span class="muted">3 天前</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">成绩趋势</div>
+      <div class="card">
+        <svg class="line" viewBox="0 0 600 120" preserveAspectRatio="none">
+          <polyline points="0,95 85,88 170,90 255,70 340,74 425,52 510,40 600,30" fill="none" stroke="var(--color-accent)" stroke-width="2.5"/>
+          <g fill="var(--color-accent)" r="4"><circle cx="0" cy="95"/><circle cx="85" cy="88"/><circle cx="170" cy="90"/><circle cx="255" cy="70"/><circle cx="340" cy="74"/><circle cx="425" cy="52"/><circle cx="510" cy="40"/><circle cx="600" cy="30"/></g>
+        </svg>
+        <div class="axis"><span>第1周</span><span>第2周</span><span>第3周</span><span>第4周</span><span>第5周</span><span>第6周</span><span>第7周</span><span>本周</span></div>
+        <div class="legend"><span><i style="background:var(--color-accent)"></i>周测平均分</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 闪卡 ============ -->
+  <section class="page" id="page-flashcard">
+    <div class="page-head">
+      <div class="eyebrow">学习 · 闪卡</div>
+      <h1>闪卡复习</h1>
+      <div class="sub">卡片是核心，无侧栏。背景有氛围，文字永远是第一视觉层。</div>
+    </div>
+
+    <div class="fc-wrap">
+      <div class="fc-progress">复习进度 <b>26 / 32</b></div>
+      <div class="fc-card" id="fcCard" tabindex="0" role="button" aria-label="翻面查看答案">
+        <div class="fc-inner">
+          <div class="fc-face fc-mist front">
+            <span class="fc-tag">数学 · 数列</span>
+            <div class="fc-q">等差数列的前 n 项和公式是什么？</div>
+          </div>
+          <div class="fc-face fc-mist back">
+            <span class="fc-tag">答案</span>
+            <div class="fc-a">S<sub>n</sub> = n(a<sub>1</sub> + a<sub>n</sub>) / 2<br>= na<sub>1</sub> + n(n-1)d / 2</div>
+          </div>
+        </div>
+      </div>
+      <div class="fc-themes" aria-label="背景主题">
+        <span class="sw" style="background:linear-gradient(135deg,#e8eef4,#d4deea)" title="晨雾" data-face="fc-mist"></span>
+        <span class="sw" style="background:linear-gradient(140deg,#0d1117,#24334f)" title="夜空" data-face="fc-night"></span>
+        <span class="sw" style="background:linear-gradient(135deg,#1e3a2f,#2f5d46)" title="森林" data-face="fc-forest"></span>
+        <span class="sw" style="background:linear-gradient(135deg,#f5e7cf,#ead3ac)" title="琥珀纸页" data-face="fc-amber"></span>
+        <span class="sw" style="background:var(--color-surface)" title="极简" data-face="fc-minimal"></span>
+      </div>
+      <div class="fc-rating" id="fcRating" aria-label="评价掌握程度">
+        <button data-r="1"><span class="e">😣</span><span class="t">不会 · 1天</span></button>
+        <button data-r="2"><span class="e">🤔</span><span class="t">模糊 · 3天</span></button>
+        <button data-r="3"><span class="e">🙂</span><span class="t">会了 · 7天</span></button>
+        <button data-r="4"><span class="e">😎</span><span class="t">熟练 · 14天</span></button>
+      </div>
+      <div class="fc-hint">四档评价均有文字标签与键盘焦点，不依赖表情符号传义。<span class="kbd">1/2/3/4</span> 或 <span class="kbd">Space</span> 翻面</div>
+    </div>
+  </section>
+
+  <!-- ============ 周复盘 ============ -->
+  <section class="page" id="page-week" data-scope="review-data">
+    <div class="page-head">
+      <div class="eyebrow">复盘 · 数据驾驶舱</div>
+      <h1>周复盘 <span class="flag">review-data</span></h1>
+      <div class="sub">2026年8月17日 — 8月23日 · 本周整体执行与学习表现，形成下周调整。</div>
+    </div>
+
+    <div class="grid cols-4">
+      <div class="card"><div class="data-block"><div class="l">学习时长</div><div class="v">12.5h</div><div class="d d-up">▲ +2.1h</div></div></div>
+      <div class="card"><div class="data-block"><div class="l">任务完成率</div><div class="v">78%</div><div class="d d-up">▲ +6%</div></div></div>
+      <div class="card"><div class="data-block"><div class="l">闪卡复习</div><div class="v">142</div><div class="d secondary">张</div></div></div>
+      <div class="card"><div class="data-block"><div class="l">新增错题</div><div class="v">23</div><div class="d d-down">▼ 需关注</div></div></div>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="panel">
+        <div class="section-title">完成率趋势（逐日）</div>
+        <div class="chart">
+          <div class="chart-row"><span class="lbl">周一</span><div class="bar"><span style="width:64%;background:var(--chart-1)"></span></div><span class="val">64%</span></div>
+          <div class="chart-row"><span class="lbl">周二</span><div class="bar"><span style="width:82%;background:var(--chart-1)"></span></div><span class="val">82%</span></div>
+          <div class="chart-row"><span class="lbl">周三</span><div class="bar"><span style="width:70%;background:var(--chart-1)"></span></div><span class="val">70%</span></div>
+          <div class="chart-row"><span class="lbl">周四</span><div class="bar"><span style="width:90%;background:var(--chart-1)"></span></div><span class="val">90%</span></div>
+          <div class="chart-row"><span class="lbl">周五</span><div class="bar"><span style="width:76%;background:var(--chart-1)"></span></div><span class="val">76%</span></div>
+          <div class="chart-row"><span class="lbl">周六</span><div class="bar"><span style="width:58%;background:var(--chart-1)"></span></div><span class="val">58%</span></div>
+          <div class="chart-row"><span class="lbl">周日</span><div class="bar"><span style="width:85%;background:var(--chart-1)"></span></div><span class="val">85%</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="section-title">学科分布</div>
+        <div class="chart">
+          <div class="chart-row"><span class="lbl">数学</span><div class="bar"><span style="width:36%;background:var(--chart-1)"></span></div><span class="val">36%</span></div>
+          <div class="chart-row"><span class="lbl">英语</span><div class="bar"><span style="width:26%;background:var(--chart-2)"></span></div><span class="val">26%</span></div>
+          <div class="chart-row"><span class="lbl">物理</span><div class="bar"><span style="width:20%;background:var(--chart-3)"></span></div><span class="val">20%</span></div>
+          <div class="chart-row"><span class="lbl">化学</span><div class="bar"><span style="width:12%;background:var(--chart-4)"></span></div><span class="val">12%</span></div>
+          <div class="chart-row"><span class="lbl">生物</span><div class="bar"><span style="width:6%;background:var(--chart-6)"></span></div><span class="val">6%</span></div>
+        </div>
+        <div class="legend"><span><i style="background:var(--chart-1)"></i>数学</span><span><i style="background:var(--chart-2)"></i>英语</span><span><i style="background:var(--chart-3)"></i>物理</span><span><i style="background:var(--chart-4)"></i>化学</span><span><i style="background:var(--chart-6)"></i>生物</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="section-title">错题类型</div>
+      <div class="chart">
+        <div class="chart-row"><span class="lbl">概念不清</span><div class="bar"><span style="width:48%;background:var(--chart-5)"></span></div><span class="val">11</span></div>
+        <div class="chart-row"><span class="lbl">计算失误</span><div class="bar"><span style="width:30%;background:var(--chart-3)"></span></div><span class="val">7</span></div>
+        <div class="chart-row"><span class="lbl">粗心漏项</span><div class="bar"><span style="width:22%;background:var(--chart-2)"></span></div><span class="val">5</span></div>
+      </div>
+      <div class="legend"><span><i style="background:var(--chart-5)"></i>概念不清</span><span><i style="background:var(--chart-3)"></i>计算失误</span><span><i style="background:var(--chart-2)"></i>粗心漏项</span></div>
+    </div>
+
+    <div class="next-step">
+      <div class="tt">📌 下一步</div>
+      <textarea placeholder="根据本周表现，写下下周要调整的一件事……"></textarea>
+      <div class="actions"><button class="btn primary">创建为任务</button><button class="btn">指定日期</button><button class="btn">回到计划</button></div>
+    </div>
+  </section>
+
+  <!-- ============ 月复盘 ============ -->
+  <section class="page" id="page-month" data-scope="review-data">
+    <div class="page-head">
+      <div class="eyebrow">复盘 · 数据驾驶舱</div>
+      <h1>月复盘 <span class="flag">review-data</span></h1>
+      <div class="sub">2026年8月 · 整体节奏、成果、问题与下一阶段方向。</div>
+    </div>
+
+    <div class="grid cols-4">
+      <div class="card"><div class="data-block"><div class="l">月学习时长</div><div class="v">52h</div><div class="d d-up">▲ +8h</div></div></div>
+      <div class="card"><div class="data-block"><div class="l">任务完成率</div><div class="v">74%</div><div class="d secondary">全月</div></div></div>
+      <div class="card"><div class="data-block"><div class="l">掌握度提升</div><div class="v">+11%</div><div class="d d-up">▲ 较上月</div></div></div>
+      <div class="card"><div class="data-block"><div class="l">闪卡总量</div><div class="v">486</div><div class="d secondary">张</div></div></div>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="panel">
+        <div class="section-title">每日学习时长热力</div>
+        <div class="heatmap">
+          <div class="cell">一</div><div class="cell f1">0.5</div><div class="cell f2">2</div><div class="cell f3">3</div><div class="cell f2">1.5</div><div class="cell f3">2.5</div><div class="cell f1">0.5</div>
+          <div class="cell">二</div><div class="cell f2">1.5</div><div class="cell f4">4</div><div class="cell f3">2.5</div><div class="cell f2">2</div><div class="cell f3">3</div><div class="cell f1">1</div>
+          <div class="cell">三</div><div class="cell f2">2</div><div class="cell f3">3</div><div class="cell f2">1.5</div><div class="cell f4">4.5</div><div class="cell f3">3</div><div class="cell f2">2</div>
+          <div class="cell">四</div><div class="cell f3">2.5</div><div class="cell f2">1.5</div><div class="cell f3">3</div><div class="cell f2">2</div><div class="cell f1">0.5</div><div class="cell f4">4</div>
+        </div>
+        <div class="legend"><span><i style="background:var(--chart-7)"></i>0.5h</span><span><i style="background:var(--chart-6)"></i>1–2h</span><span><i style="background:var(--chart-2)"></i>2–3h</span><span><i style="background:var(--chart-1)"></i>3h+</span></div>
+      </div>
+      <div class="panel">
+        <div class="section-title">月内成绩趋势</div>
+        <svg class="line" viewBox="0 0 600 120" preserveAspectRatio="none">
+          <polyline points="0,100 85,92 170,96 255,80 340,84 425,62 510,54 600,42" fill="none" stroke="var(--color-accent)" stroke-width="2.5"/>
+          <g fill="var(--color-accent)"><circle cx="0" cy="100"/><circle cx="85" cy="92"/><circle cx="170" cy="96"/><circle cx="255" cy="80"/><circle cx="340" cy="84"/><circle cx="425" cy="62"/><circle cx="510" cy="54"/><circle cx="600" cy="42"/></g>
+        </svg>
+        <div class="axis"><span>第1周</span><span>第2周</span><span>第3周</span><span>第4周</span></div>
+      </div>
+    </div>
+
+    <div class="next-step">
+      <div class="tt">📌 下一步</div>
+      <textarea placeholder="为下个月定一个可执行的阶段目标……"></textarea>
+      <div class="actions"><button class="btn primary">创建为任务</button><button class="btn">指定日期</button><button class="btn">回到计划</button></div>
+    </div>
+  </section>
+
+  <!-- ============ 考试复盘 ============ -->
+  <section class="page" id="page-exam" data-scope="review-data">
+    <div class="page-head">
+      <div class="eyebrow">复盘 · 数据驾驶舱</div>
+      <h1>考试复盘 <span class="flag">review-data</span></h1>
+      <div class="sub">2026年8月 第一次月考 · 这次考试暴露了什么，接下来怎么修正。</div>
+    </div>
+
+    <div class="grid cols-4">
+      <div class="card"><div class="data-block"><div class="l">总分</div><div class="v">621</div><div class="d d-up">▲ +18</div></div></div>
+      <div class="card"><div class="data-block"><div class="l">年级排名</div><div class="v">38<span style="font-size:var(--font-size-base)">/512</span></div><div class="d d-up">▲ 前进 12 名</div></div></div>
+      <div class="card"><div class="data-block"><div class="l">班级排名</div><div class="v">5<span style="font-size:var(--font-size-base)">/46</span></div><div class="d secondary">持平</div></div></div>
+      <div class="card"><div class="data-block"><div class="l">失分题数</div><div class="v">31</div><div class="d d-down">▼ 待修正</div></div></div>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="panel">
+        <div class="section-title">各科得分与满分比</div>
+        <div class="chart">
+          <div class="chart-row"><span class="lbl">数学</span><div class="bar"><span style="width:86%;background:var(--chart-1)"></span></div><span class="val">129/150</span></div>
+          <div class="chart-row"><span class="lbl">语文</span><div class="bar"><span style="width:80%;background:var(--chart-2)"></span></div><span class="val">120/150</span></div>
+          <div class="chart-row"><span class="lbl">英语</span><div class="bar"><span style="width:90%;background:var(--chart-3)"></span></div><span class="val">135/150</span></div>
+          <div class="chart-row"><span class="lbl">物理</span><div class="bar"><span style="width:72%;background:var(--chart-4)"></span></div><span class="val">72/100</span></div>
+          <div class="chart-row"><span class="lbl">化学</span><div class="bar"><span style="width:78%;background:var(--chart-6)"></span></div><span class="val">78/100</span></div>
+        </div>
+        <div class="legend"><span><i style="background:var(--chart-1)"></i>数学</span><span><i style="background:var(--chart-2)"></i>语文</span><span><i style="background:var(--chart-3)"></i>英语</span><span><i style="background:var(--chart-4)"></i>物理</span><span><i style="background:var(--chart-6)"></i>化学</span></div>
+      </div>
+      <div class="panel">
+        <div class="section-title">失分原因分布</div>
+        <div class="chart">
+          <div class="chart-row"><span class="lbl">概念漏洞</span><div class="bar"><span style="width:42%;background:var(--chart-5)"></span></div><span class="val">13</span></div>
+          <div class="chart-row"><span class="lbl">计算失误</span><div class="bar"><span style="width:26%;background:var(--chart-3)"></span></div><span class="val">8</span></div>
+          <div class="chart-row"><span class="lbl">审题不清</span><div class="bar"><span style="width:19%;background:var(--chart-2)"></span></div><span class="val">6</span></div>
+          <div class="chart-row"><span class="lbl">时间不足</span><div class="bar"><span style="width:13%;background:var(--chart-1)"></span></div><span class="val">4</span></div>
+        </div>
+        <div class="legend"><span><i style="background:var(--chart-5)"></i>概念漏洞</span><span><i style="background:var(--chart-3)"></i>计算失误</span><span><i style="background:var(--chart-2)"></i>审题不清</span><span><i style="background:var(--chart-1)"></i>时间不足</span></div>
+      </div>
+    </div>
+
+    <div class="next-step">
+      <div class="tt">📌 下一步</div>
+      <textarea placeholder="针对这次失分最重的知识点，写下一个可执行的修正动作……"></textarea>
+      <div class="actions"><button class="btn primary">创建为任务</button><button class="btn">指定日期</button><button class="btn">回到计划</button></div>
+    </div>
+  </section>
+  </main>
+</div>
+
+<script>
+const themeSeg=document.getElementById('themeSeg');
+const pageSeg=document.getElementById('pageSeg');
+themeSeg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  document.documentElement.setAttribute('data-theme',b.dataset.theme);
+  themeSeg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));});
+pageSeg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id==='page-'+b.dataset.page));
+  pageSeg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));});
+const fcCard=document.getElementById('fcCard');
+fcCard.addEventListener('click',()=>fcCard.classList.toggle('flipped'));
+fcCard.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();fcCard.classList.toggle('flipped');}});
+document.querySelectorAll('.fc-themes .sw').forEach(sw=>sw.addEventListener('click',()=>{
+  const face=sw.dataset.face;
+  document.querySelectorAll('.fc-face').forEach(f=>{f.className='fc-face '+face+(f.classList.contains('back')?' back':'')});}));
+const rating=document.getElementById('fcRating');
+rating.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  rating.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b));});
+document.addEventListener('keydown',e=>{if(document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName))return;
+  const n=parseInt(e.key,10);if(n>=1&&n<=4){const b=rating.querySelector('[data-r="'+n+'"]');if(b){rating.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b));}}});
+</script>
+</body>
+</html>

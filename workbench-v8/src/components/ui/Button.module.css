@@ -1,0 +1,108 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast), color var(--transition-fast),
+    border-color var(--transition-fast), transform var(--transition-fast),
+    box-shadow var(--transition-fast), filter var(--transition-fast);
+  cursor: pointer;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  line-height: 1;
+  padding: 0 16px;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 几何: Compact 32 / Standard 36 / Major 40 */
+.compact {
+  height: 32px;
+  font-size: 13px;
+  padding: 0 12px;
+}
+
+.standard {
+  height: 36px;
+  font-size: 14px;
+}
+
+.major {
+  height: 40px;
+  font-size: 14px;
+}
+
+/* 字号: Sec/Quiet 13px，Primary/Major 14px */
+.secondary,
+.quiet {
+  font-size: 13px;
+}
+
+/* 语义变体 */
+.primary {
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+}
+.primary:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.secondary {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+.secondary:hover:not(:disabled) {
+  background: var(--color-surface);
+}
+
+.quiet {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+.quiet:hover:not(:disabled) {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+.destructive {
+  background: var(--color-danger);
+  color: #fff;
+}
+.destructive:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+/* Loading / Success */
+.loading {
+  cursor: progress;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: btnSpin 0.7s linear infinite;
+}
+
+.success {
+  background: var(--color-success);
+  color: #fff;
+}
+
+@keyframes btnSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,175 @@
+/* ============================================================
+   V9 Personal OS — 三区微动效 + 任务完成动画（V9_MASTER_PLAN §37/§38）
+   LIFE 柔和（fade/paper light/slow glow）
+   WORK 快速明确（check/shift/snap/data update）
+   PLAY 丰富（cover hover/glow/progress animation）
+   全部遵循 prefers-reduced-motion（Accessibility 铁律）
+   ============================================================ */
+
+/* ---------- C0 动作语义令牌（统一契约，组件禁止自造动画语言） ----------
+   Hover / Focus / Press  → .theme-interactive.is-hovered / .is-active / .is-focus（theme.css §12 + motion.css §2）
+   Loading                → .skeleton + skeleton-shimmer（theme.css §9）
+   Success / Complete / Error / DataChange 由下列统一 data-feedback 表达： */
+
+[data-feedback='success'] {
+  animation: saved-flash 1.2s ease;
+}
+
+[data-feedback='complete'] {
+  animation: v9-done-settle 320ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+[data-feedback='error'] {
+  animation: v9-fb-shake 320ms ease;
+}
+
+[data-feedback='datachange'] {
+  animation: motion-data-change var(--transition-slow) var(--ease-out-soft);
+}
+
+@keyframes v9-fb-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+/* ---------- 三区微风格 ---------- */
+
+/* LIFE：柔和 */
+[data-v9-zone='life'] .theme-interactive,
+[data-v9-zone='life'] button,
+[data-v9-zone='life'] a {
+  transition:
+    background-color 300ms ease,
+    color 300ms ease,
+    opacity 300ms ease,
+    transform 300ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+[data-v9-zone='life'] .panel,
+[data-v9-zone='life'] [class*='card'] {
+  transition: box-shadow 500ms ease, transform 500ms ease;
+}
+
+/* WORK：快速明确 */
+[data-v9-zone='work'] .theme-interactive,
+[data-v9-zone='work'] button,
+[data-v9-zone='work'] a {
+  transition:
+    background-color 120ms ease,
+    transform 120ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+[data-v9-zone='work'] .panel {
+  transition: box-shadow 180ms ease;
+}
+
+/* PLAY：丰富 */
+[data-v9-zone='play'] .theme-interactive:hover,
+[data-v9-zone='play'] [class*='item']:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+[data-v9-zone='play'] .theme-interactive {
+  transition:
+    transform 240ms cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 240ms ease;
+}
+
+/* ---------- 任务完成动画（V9_MASTER_PLAN §38） ----------
+   press → checkbox confirm → line transition → 微弱粒子/光晕 → 状态变更 → EventBus
+   以 data-v9-done 属性驱动（CSS 模块哈希类无法被全局层可靠命中） */
+
+[data-v9-done='true'] {
+  animation: v9-done-settle 320ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+[data-v9-done='true'] > *:not(button) {
+  opacity: 0.55;
+}
+
+/* 划线过渡：对标题类文本生效（元素自身需带 title 语义的 span） */
+[data-v9-done='true'] [data-v9-done-title] {
+  position: relative;
+  color: var(--color-text-tertiary);
+}
+
+[data-v9-done='true'] [data-v9-done-title]::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 1px;
+  width: 0;
+  background: var(--color-text-tertiary);
+  animation: v9-line-through 260ms ease forwards;
+}
+
+/* 完成光晕（四主题各有色彩，统一用 accent 变量） */
+[data-v9-done-glow='true']::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: v9-glow 600ms ease-out forwards;
+}
+
+@keyframes v9-done-settle {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.015);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes v9-line-through {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes v9-glow {
+  0% {
+    box-shadow: 0 0 0 0 var(--color-accent-light);
+    opacity: 0.9;
+  }
+  100% {
+    box-shadow: 0 0 18px 6px var(--color-accent-light);
+    opacity: 0;
+  }
+}
+
+/* ---------- Accessibility：减少动效 ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-v9-zone] *,
+  [data-v9-zone] *::before,
+  [data-v9-zone] *::after,
+  [data-v9-done='true'],
+  [data-v9-done='true'] [data-v9-done-title]::after,
+  [data-v9-done-glow='true']::after {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+
+  [data-v9-done='true'] [data-v9-done-title]::after {
+    width: 100%;
+  }
+}

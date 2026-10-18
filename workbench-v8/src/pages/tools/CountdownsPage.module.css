@@ -1,0 +1,227 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: box-shadow var(--transition-fast);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cardInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.targetDate {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.daysRemaining {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-accent);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.daysLabel {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 2px 0 0;
+}
+
+.cardBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.typeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+}
+
+.typeIcon {
+  font-size: 14px;
+}
+
+.showHome {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+.actions {
+  display: flex;
+  gap: 4px;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.actionBtn:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+/* Form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.typeSelect {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.typeOption {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  font-size: 13px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.typeOption:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+.typeOptionActive {
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: var(--color-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  border: none;
+  padding: 0;
+}
+
+.toggleOn {
+  background: var(--color-accent);
+}
+
+.toggleKnob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform var(--transition-fast);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.toggleOn .toggleKnob {
+  transform: translateX(20px);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.homeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--color-success);
+  padding: 2px 8px;
+  background: var(--color-success-light);
+  border-radius: var(--radius-full);
+}

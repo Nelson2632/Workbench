@@ -1,0 +1,195 @@
+/* ============================================================
+   Personal Workbench V8 — Global Styles
+   ============================================================ */
+
+@import './theme.css';
+
+/* ---- Box-sizing reset ---- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ---- Scrollbar（RF：B2.4 全局滚动条统一，语义同侧栏 A2）
+   细、圆角、半透明；仅精确指针 hover 设备启用，触屏不套自定义滚动条 ---- */
+@media (hover: hover) {
+  :root {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: var(--radius-full);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-tertiary);
+  }
+}
+
+/* ---- Button reset ---- */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 1px;
+}
+
+/* ---- Input reset ---- */
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  padding: 8px 12px;
+  transition: border-color var(--transition-fast);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-border-focus);
+}
+
+/* ---- Link reset ---- */
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-accent-hover);
+}
+
+/* ---- Utility classes ---- */
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Responsive Utilities ---- */
+
+.hide-mobile {
+  /* 桌面端不覆盖 display，交给元素自身类（如 .sidebar 的 flex）决定；
+     移动端由下方 media query 隐藏。避免 display:initial 破坏 flex 布局导致侧栏无法滚动 */
+}
+
+.show-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+
+  .show-mobile {
+    display: initial;
+  }
+}
+
+/* ---- Minimum Touch Targets (44px) ---- */
+
+@media (max-width: 768px) {
+  button,
+  a,
+  select,
+  input[type='checkbox'],
+  input[type='radio'],
+  .clickable {
+    min-height: 44px;
+  }
+
+  button:has(svg),
+  a:has(svg) {
+    min-width: 44px;
+  }
+
+  select,
+  input,
+  textarea {
+    font-size: 16px; /* Prevent iOS zoom on focus */
+  }
+}
+
+/* ---- Mobile Font Sizes ---- */
+
+@media (max-width: 768px) {
+  body {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  h2 {
+    font-size: 18px;
+  }
+}
+
+/* ---- Responsive Scrollable Containers ---- */
+
+.scrollable {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  .scrollable {
+    max-height: calc(100vh - 120px);
+  }
+}

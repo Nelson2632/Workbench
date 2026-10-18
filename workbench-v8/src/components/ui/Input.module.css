@@ -1,0 +1,80 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin: 0;
+}
+
+.error {
+  font-size: 12px;
+  color: var(--color-danger);
+  margin: 0;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  font-size: 14px;
+}
+
+/* 几何: Compact 32 / Standard 36 / Major 40 */
+.input.compact {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.input.standard {
+  height: 36px;
+  padding: 0 14px;
+}
+
+.input.major {
+  height: 40px;
+  padding: 0 14px;
+}
+
+.textarea {
+  min-height: 80px;
+  padding: 10px 14px;
+  resize: vertical;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* :focus = 编辑态（鼠标/键盘进入交互上下文） */
+.input:focus,
+.textarea:focus {
+  border-color: var(--color-border-focus);
+  outline: none;
+}
+
+/* :focus-visible = 可见键盘焦点（2px ring / offset 1px） */
+.input:focus-visible,
+.textarea:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 1px;
+}
+
+.inputError {
+  border-color: var(--color-danger);
+}

@@ -1,0 +1,49 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1;
+  margin-left: var(--sidebar-w);
+  padding: 32px;
+  min-height: 100vh;
+  background: var(--color-bg);
+  transition: margin-left var(--transition-normal), background-color var(--transition-normal);
+}
+
+.sidebarCollapsed .main {
+  margin-left: var(--sidebar-w-collapsed);
+}
+
+/* Canvas 宽度体系 */
+.canvas {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.wide1080 {
+  max-width: 1080px;
+}
+
+.wide1200 {
+  max-width: 1200px;
+}
+
+.narrow720 {
+  max-width: 720px;
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 768px) {
+  .main {
+    margin-left: 0;
+    padding: 16px;
+    padding-top: 56px; /* Space for hamburger button */
+  }
+
+  .sidebarCollapsed .main {
+    margin-left: 0;
+  }
+}

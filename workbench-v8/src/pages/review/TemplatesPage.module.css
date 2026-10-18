@@ -1,0 +1,267 @@
+/* ============================================================
+   TemplatesPage — 模板管理
+   ============================================================ */
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ---- Template Grid ---- */
+.templateGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.templateCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.templateCard:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-accent);
+}
+
+.templateName {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 8px;
+}
+
+.templateMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.templateType {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+}
+
+.templateQuestionCount {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.templateQuestionPreview {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  line-height: 1.6;
+  max-height: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.templateActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* ---- Add Button ---- */
+.addBar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+/* ---- Modal Form ---- */
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.formInput {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast);
+  font-family: inherit;
+}
+
+.formInput:focus {
+  border-color: var(--color-border-focus);
+}
+
+.formSelect {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+  outline: none;
+}
+
+.formSelect:focus {
+  border-color: var(--color-border-focus);
+}
+
+/* ---- Questions List ---- */
+.questionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.questionRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.questionInput {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast);
+  font-family: inherit;
+}
+
+.questionInput:focus {
+  border-color: var(--color-border-focus);
+}
+
+.questionRemoveBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: none;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.questionRemoveBtn:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.addQuestionBtn {
+  padding: 8px 16px;
+  font-size: 13px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-accent);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.addQuestionBtn:hover {
+  background: var(--color-accent-light);
+  border-color: var(--color-accent);
+}
+
+.modalActions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+/* ---- Default Templates Section ---- */
+.defaultSection {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.defaultTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin: 0 0 12px;
+}
+
+.defaultInfo {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+/* ---- Loading ---- */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  color: var(--color-text-tertiary);
+  font-size: 14px;
+}
+
+/* ---- Empty ---- */
+.emptySection {
+  padding: 48px;
+  text-align: center;
+}
+
+/* Type badge colors */
+.typeDaily {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.typeSubject {
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+}
+
+.typeWeekly {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.typeMonthly {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.typeExam {
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+}

@@ -1,0 +1,82 @@
+/* NavigatorPage — 导航总览 */
+
+.page {
+  display: flex;
+  flex-direction: column;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.cardLink {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.cardLink:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--color-accent);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.children {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.child {
+  padding: 6px 12px;
+  font-size: 13px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.child:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: var(--color-accent-light);
+}

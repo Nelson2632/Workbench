@@ -1,0 +1,123 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: modalFadeIn 0.25s ease;
+}
+
+.overlayClosing {
+  animation: modalFadeOut 0.25s ease forwards;
+}
+
+.modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 90%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  animation: modalScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modalClosing {
+  animation: modalScaleOut 0.25s ease forwards;
+}
+
+.sm { max-width: 400px; }
+.md { max-width: 560px; }
+.lg { max-width: 720px; }
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: 20px;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.closeBtn:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+.body {
+  padding: 0 24px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes modalScaleIn {
+  from { opacity: 0; transform: scale(0.92) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes modalScaleOut {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to { opacity: 0; transform: scale(0.92) translateY(8px); }
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 768px) {
+  .modal {
+    width: 95%;
+    max-height: 90vh;
+    border-radius: var(--radius-md);
+  }
+
+  .sm,
+  .md,
+  .lg {
+    max-width: 100%;
+  }
+
+  .header {
+    padding: 16px 18px 12px;
+  }
+
+  .body {
+    padding: 0 18px 18px;
+  }
+
+  .title {
+    font-size: 16px;
+  }
+
+  .closeBtn {
+    width: 40px;
+    height: 40px;
+  }
+}

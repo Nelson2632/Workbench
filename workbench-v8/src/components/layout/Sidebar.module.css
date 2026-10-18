@@ -1,0 +1,377 @@
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-w);
+  min-height: 0; /* 防 flex 子项因 min-height:auto 无法收缩 */
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+  /* Edge Toggle 需 50% 外凸，不能裁剪；内容滚动由 .nav 自身 overflow-y 承担 */
+  overflow: visible;
+  transition: width var(--transition-normal);
+}
+
+.collapsed {
+  width: var(--sidebar-w-collapsed);
+}
+.collapsed .groupIcon {
+  font-size: 20px; /* A1.1 icon-collapsed: 20px */
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 18px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.brandIcon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.brandTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.nav {
+  flex: 1 1 auto;
+  min-height: 0; /* flex 列布局下必须置 0，否则不收缩、不触发滚动，底部被挤出视口 */
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain; /* 滚轮在侧边栏内滚动，不传播到主页面 */
+  padding: 8px 0;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.nav:hover {
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.nav::-webkit-scrollbar {
+  width: 8px;
+}
+
+.nav::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.nav::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+.group {
+  margin-bottom: 2px;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  border-radius: 0;
+  transition: background var(--transition-fast);
+  width: 100%;
+  text-align: left;
+}
+
+.groupHeader:hover {
+  background: var(--color-surface-2);
+}
+
+.groupIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.groupLabel {
+  flex: 1;
+  white-space: nowrap;
+}
+
+.arrow {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  transition: transform var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.arrowOpen {
+  transform: rotate(90deg);
+}
+
+.children {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--transition-normal) var(--ease-out-soft);
+}
+
+.childrenOpen {
+  grid-template-rows: 1fr;
+}
+
+.childrenInner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.childLink {
+  display: flex;
+  align-items: center;
+  padding: 8px 18px 8px 46px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  border-radius: 0;
+}
+
+.childLink:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+.childLinkActive {
+  color: var(--color-accent);
+  background: var(--color-accent-light);
+  font-weight: 500;
+}
+
+.bottomNav {
+  border-top: 1px solid var(--color-border);
+  padding: 8px 0;
+  flex-shrink: 0;
+}
+
+.bottomLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  width: 100%;
+}
+
+.bottomLink:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+.bottomLinkActive {
+  color: var(--color-accent);
+  background: var(--color-accent-light);
+  font-weight: 500;
+}
+
+.bottomIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* ---- Theme Switcher ---- */
+
+.themeSwitcher {
+  border-top: 1px solid var(--color-border);
+  padding: 8px 12px;
+  flex-shrink: 0;
+}
+
+.themeSwitcherRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.themeSwitcherLabel {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+}
+
+.themeSwitcherOptions {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.themeSwitcherBtn,
+.themeCycle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 30px;
+  font-size: 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.themeSwitcherBtn {
+  flex: 1;
+}
+
+.themeSwitcherBtn:hover,
+.themeCycle:hover {
+  background: var(--color-surface-2);
+}
+
+.themeSwitcherBtnActive {
+  background: var(--color-accent-light);
+  box-shadow: inset 0 0 0 1.5px var(--color-accent);
+}
+
+.themeCycle {
+  margin: 0 auto;
+}
+
+/* ---- Collapse / Expand Toggle（右侧边缘垂直居中，RF-11） ---- */
+
+.collapseToggle {
+  position: absolute;
+  right: -9px; /* B4.1 Edge Toggle 50% overlap（宽 18px，外凸 9px）*/
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 52px;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+  cursor: pointer;
+  z-index: 2;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.collapseToggle:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+.collapseToggle:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+
+/* ---- Hamburger Menu Button (Mobile) ---- */
+
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 60;
+  width: 40px;
+  height: 40px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+
+.hamburgerLine {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--color-text-primary);
+  border-radius: 1px;
+  transition: all var(--transition-fast);
+}
+
+/* ---- Mobile Drawer ---- */
+
+.mobileDrawer {
+  transform: translateX(-100%);
+  transition: transform var(--transition-normal);
+  z-index: 70;
+  box-shadow: var(--shadow-lg);
+}
+
+.mobileDrawerOpen {
+  transform: translateX(0);
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 65;
+  animation: fadeIn 0.2s ease;
+}
+
+.mobileCloseBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.mobileCloseBtn:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex;
+  }
+
+  .overlay {
+    display: block;
+  }
+
+  .mobileDrawer {
+    display: flex;
+  }
+}

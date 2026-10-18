@@ -1,0 +1,250 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Header actions */
+.headerActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Lock screen */
+.lockScreen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 360px;
+}
+
+.lockCard {
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  padding: 40px 32px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+
+.lockIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.lockTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 8px;
+}
+
+.lockDesc {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0 0 24px;
+  line-height: 1.6;
+}
+
+.lockForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.lockField {
+  width: 100%;
+}
+
+.lockError {
+  font-size: 13px;
+  color: var(--color-danger);
+  margin: 0;
+}
+
+/* Entry list */
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-fast);
+  overflow: hidden;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.cardBody {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px;
+  gap: 12px;
+}
+
+.cardInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.platform {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.username {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0 0 6px;
+}
+
+.passwordRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.passwordLabel {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.passwordValue {
+  font-size: 13px;
+  font-family: 'Courier New', monospace;
+  background: var(--color-surface-2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: var(--color-text-primary);
+  letter-spacing: 2px;
+}
+
+.inlineBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  font-size: 14px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  transition: background var(--transition-fast), color var(--transition-fast);
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+.inlineBtn:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+.url {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin: 0 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.urlLink {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.urlLink:hover {
+  text-decoration: underline;
+}
+
+.note {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin: 0 0 4px;
+}
+
+.lastUsed {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  margin: 0;
+}
+
+.cardActions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  transition: background var(--transition-fast), color var(--transition-fast);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+.actionBtn:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+/* Form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.errorText {
+  font-size: 13px;
+  color: var(--color-danger);
+  margin: 0;
+}

@@ -1,0 +1,140 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.anchor {
+  position: relative;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 0 14px;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+  text-align: left;
+}
+
+.compact {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.standard {
+  height: 36px;
+  font-size: 14px;
+}
+
+.major {
+  height: 40px;
+  font-size: 14px;
+}
+
+.trigger:hover:not(.disabled) {
+  border-color: var(--color-border-focus);
+}
+
+.trigger.open {
+  border-color: var(--color-border-focus);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 1px;
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.caret {
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+  transition: transform var(--transition-fast);
+}
+
+.open .caret {
+  transform: rotate(180deg);
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 200;
+  max-height: 280px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.option:hover {
+  background: var(--color-surface-2);
+}
+
+/* Active Option = 键盘导航位置 */
+.option.active {
+  background: var(--color-surface-2);
+}
+
+/* Selected = 当前值 */
+.option.selected {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-semibold);
+}
+
+.option.selected.active {
+  background: var(--color-surface-2);
+}
+
+.empty {
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+}

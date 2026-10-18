@@ -1,0 +1,368 @@
+/* ============================================================
+   Personal Workbench V8 — MistakesPage Styles
+   ============================================================ */
+
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filterBar select,
+.filterBar input {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.filterBar select:focus,
+.filterBar input:focus {
+  border-color: var(--color-border-focus);
+}
+
+.toggleBtn {
+  padding: 6px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.toggleBtn:hover {
+  background: var(--color-surface-2);
+}
+
+.toggleBtnActive {
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+/* ---- Flip Card ---- */
+.flipCard {
+  perspective: 1000px;
+  height: 260px;
+  cursor: pointer;
+}
+
+.flipCardInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s ease;
+  transform-style: preserve-3d;
+}
+
+.flipped .flipCardInner {
+  transform: rotateY(180deg);
+}
+
+.flipCardFront,
+.flipCardBack {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.flipCardBack {
+  transform: rotateY(180deg);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.subjectBadge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+}
+
+.errorTypeTag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.questionText {
+  font-size: 14px;
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  flex: 1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  margin-bottom: 8px;
+}
+
+.answerText {
+  font-size: 14px;
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.date {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+.tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+}
+
+.backActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.backActions button {
+  padding: 4px 12px;
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.backActions button:hover {
+  background: var(--color-surface-2);
+}
+
+.masteredBtn {
+  border-color: var(--color-success) !important;
+  color: var(--color-success) !important;
+}
+
+.notMasteredBtn {
+  border-color: var(--color-warning) !important;
+  color: var(--color-warning) !important;
+}
+
+.flashcardBtn {
+  border-color: var(--color-accent) !important;
+  color: var(--color-accent) !important;
+}
+
+/* ---- Modal Form ---- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.formGroup label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.formGroup select,
+.formGroup textarea,
+.formGroup input {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+  transition: border-color var(--transition-fast);
+}
+
+.formGroup select:focus,
+.formGroup textarea:focus,
+.formGroup input:focus {
+  border-color: var(--color-border-focus);
+}
+
+.formGroup textarea {
+  min-height: 80px;
+}
+
+.errorTypeGroup {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.errorTypeOption {
+  padding: 4px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  cursor: pointer;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.errorTypeOption:hover {
+  background: var(--color-surface-2);
+}
+
+.errorTypeOptionActive {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+  border-color: var(--color-warning);
+}
+
+.tagInput {
+  display: flex;
+  gap: 8px;
+}
+
+.tagInput input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  outline: none;
+}
+
+.tagsList {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tagChip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+  font-size: 12px;
+}
+
+.tagChip button {
+  background: none;
+  border: none;
+  color: var(--color-accent);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+}
+
+.knowledgeSelect {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 160px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+}
+
+.knowledgeItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+}
+
+.knowledgeItem:hover {
+  background: var(--color-surface-2);
+}
+
+.knowledgeItem input {
+  margin: 0;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  text-align: center;
+  margin-top: 12px;
+}

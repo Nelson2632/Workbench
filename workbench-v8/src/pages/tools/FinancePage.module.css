@@ -1,0 +1,329 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Summary Cards */
+.summaryRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .summaryRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summaryCard {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+.summaryLabel {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.summaryValue {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.summaryIncome {
+  color: var(--color-success);
+}
+
+.summaryExpense {
+  color: var(--color-danger);
+}
+
+/* Month Selector */
+.monthSelector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.monthBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 20px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.monthBtn:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+.monthLabel {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  min-width: 100px;
+  text-align: center;
+}
+
+/* Charts */
+.chartsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .chartsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chartCard {
+  padding: 20px;
+}
+
+.chartTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 12px;
+}
+
+/* Transaction List */
+.listTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.transactionList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.transactionItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  transition: box-shadow var(--transition-fast);
+}
+
+.transactionItem:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.transactionIcon {
+  flex-shrink: 0;
+}
+
+.iconIncome,
+.iconExpense {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.iconIncome {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.iconExpense {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.transactionInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.transactionTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.transactionMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+.transactionCategory {
+  font-size: 12px;
+  padding: 1px 8px;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+}
+
+.transactionDate {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+.transactionNote {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 120px;
+}
+
+.transactionAmount {
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.amountIncome {
+  color: var(--color-success);
+}
+
+.amountExpense {
+  color: var(--color-danger);
+}
+
+.transactionActions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.actionBtn:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+/* Form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+/* Type Toggle */
+.typeToggle {
+  display: flex;
+  gap: 0;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+}
+
+.typeOption {
+  flex: 1;
+  padding: 6px 0;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.typeOption:hover {
+  color: var(--color-text-primary);
+}
+
+.typeOptionActive {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Category Select */
+.categorySelect {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.categoryOption {
+  padding: 4px 12px;
+  font-size: 12px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.categoryOption:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+.categoryOptionActive {
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.categoryInput {
+  margin-top: 6px;
+}
+
+/* Form Actions */
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}

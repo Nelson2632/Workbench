@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1",
+  "generatedAt": "2026-08-30T00:00:00.000Z",
+  "source": { "app": "MyDiary", "version": "2.4.0", "files": ["diary_data.json", "friend_data.json", "calendar_data.json"] },
+  "counts": {
+    "diaries": 10,
+    "materials": 3,
+    "friends": 3,
+    "events": 2,
+    "sourceCount": 20,
+    "targetCount": 18,
+    "failedCount": 3,
+    "skippedCount": 2
+  },
+  "rows": {
+    "diaries": [
+      { "date": "2026-08-20", "type": "quick", "mood": "great", "weather": "sunny", "title": "食堂鸡腿好吃", "content": "完成数学卷，复习英语单词。", "photos": [], "tags": ["学习"], "createdAt": "2026-08-30T00:00:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" },
+      { "date": "2026-08-23", "type": "long", "mood": "bad", "weather": "stormy", "title": "2026-08-23 日记", "content": "今天从早上七点开始：早读背了《岳阳楼记》第三段，数学课讲了导数的应用，中午刷了两道压轴题，下午英语听写全对，晚自习把物理错题重新做了一遍，还整理了这个月的地理笔记，晚上九点半放学回家，路上听了半集红楼梦广播剧，感觉今天效率比昨天高了不少，明天继续保持这个节奏。睡前又规划了明天的安排，把周末要复习的科目列了一遍，觉得自己离目标又近了一步。", "photos": [], "tags": [], "createdAt": "2026-08-30T00:00:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" },
+      { "date": "2026-08-24", "type": "quick", "mood": null, "weather": null, "title": "测试未知枚举", "content": "今天天气很怪。", "photos": [], "tags": [], "createdAt": "2026-08-30T00:00:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" },
+      { "date": "2026-08-25", "type": "quick", "mood": "low", "weather": "snowy", "title": "2026-08-25 日记", "content": "", "photos": [], "tags": [], "createdAt": "2026-08-30T00:00:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" },
+      { "date": "2026-08-26", "type": "quick", "mood": "neutral", "weather": "overcast", "title": "背单词", "content": "背了 30 个单词。", "photos": [], "tags": [], "createdAt": "2026-08-30T00:00:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" },
+      { "date": "2026-08-27", "type": "quick", "mood": "great", "weather": "rainy", "title": "2026-08-27 日记", "content": "下雨天在家刷题。", "photos": [], "tags": [], "createdAt": "2026-08-30T00:00:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" },
+      { "date": "2026-08-28", "type": "quick", "mood": "bad", "weather": "sunny", "title": "2026-08-28 日记", "content": "考试没考好，明天继续。", "photos": [], "tags": [], "createdAt": "2026-08-30T00:00:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" },
+      { "date": "2026-08-29", "type": "quick", "mood": "great", "weather": "cloudy", "title": "2026-08-29 日记", "content": "和朋友打球。", "photos": [], "tags": [], "createdAt": "2026-08-30T00:00:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" },
+      { "date": "2026-08-30", "type": "quick", "mood": "good", "weather": "overcast", "title": "2026-08-30 日记", "content": "整理错题本。", "photos": [], "tags": [], "createdAt": "2026-08-30T00:00:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" },
+      { "date": "2026-08-31", "type": "quick", "mood": "great", "weather": "sunny", "title": "2026-08-31 日记", "content": "预习物理。", "photos": [], "tags": ["物理", "学习"], "createdAt": "2026-08-30T00:00:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" }
+    ],
+    "materials": [
+      { "title": "不积跬步，无以至千里", "category": "句子", "tags": [], "fileRefs": [], "note": "", "sourceDate": "2026-08-20", "createdAt": "2026-08-30T00:00:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" },
+      { "title": "二次函数顶点式 y=a(x-h)²+k", "category": "知识点", "tags": [], "fileRefs": [], "note": "", "sourceDate": "2026-08-23", "createdAt": "2026-08-30T00:00:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" },
+      { "title": "床前明月光", "category": "诗词", "tags": [], "fileRefs": [], "note": "", "sourceDate": "2026-08-26", "createdAt": "2026-08-30T00:00:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" }
+    ],
+    "friends": [
+      { "name": "李小明", "alias": null, "birthday": "03-15", "relationship": "同学", "contact": "", "note": "性格：开朗", "createdAt": "2026-08-30T00:00:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" },
+      { "name": "王小红", "alias": null, "birthday": null, "relationship": "同学", "contact": "wxh123", "note": "", "createdAt": "2026-08-30T00:00:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" },
+      { "name": "妈妈", "alias": null, "birthday": "11-02", "relationship": "家人", "contact": "", "note": "", "createdAt": "2026-08-30T00:00:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" }
+    ],
+    "events": [
+      { "date": "2026-09-01", "type": "custom", "title": "开学典礼", "note": "", "allDay": true, "sourceType": null, "sourceId": null, "createdAt": "2026-08-25T01:00:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" },
+      { "date": "2026-09-05", "type": "custom", "title": "数学周测", "note": "", "allDay": true, "sourceType": null, "sourceId": null, "createdAt": "2026-08-26T02:05:00.000Z", "updatedAt": "2026-08-30T00:00:00.000Z" }
+    ]
+  },
+  "issues": [
+    { "file": "diary_data.json", "legacyId": "2026-08-21", "reason": "log 非字符串", "disposition": "failed" },
+    { "file": "diary_data.json", "legacyId": "2026-08-22", "reason": "缺少 diary 对象", "disposition": "skipped" },
+    { "file": "diary_data.json", "legacyId": "2026-09-02", "reason": "空日记占位记录（无正文/心情/天气/趣事/标签）", "disposition": "skipped" },
+    { "file": "friend_data.json", "legacyId": "同学#2", "reason": "name 为空", "disposition": "failed" },
+    { "file": "calendar_data.json", "legacyId": "2026-09-05#0", "reason": "content 非字符串", "disposition": "failed" }
+  ]
+}

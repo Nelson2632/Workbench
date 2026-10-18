@@ -1,0 +1,90 @@
+{
+  "app": "MyDiary",
+  "version": "2.4.0",
+  "note": "脱敏样例（全部为虚构数据），仅用于 V9 契约 Dry Run，与真实用户数据无关",
+  "diary": {
+    "2026-08-20": {
+      "diary": { "weather": "晴", "mood": "开心", "funny": "食堂鸡腿好吃", "log": "完成数学卷，复习英语单词。", "tags": ["学习", "学习"] },
+      "tasks": { "study": ["数学卷"], "hobby": [] },
+      "materials": { "句子": ["不积跬步，无以至千里"], "诗词": [], "知识点": [] }
+    },
+    "2026-08-21": {
+      "diary": { "weather": "多云", "mood": "还行", "funny": "坏数据测试", "log": 12345, "tags": [] },
+      "tasks": { "study": [], "hobby": [] },
+      "materials": { "句子": [], "诗词": [], "知识点": [] }
+    },
+    "2026-08-22": {
+      "tasks": { "study": [], "hobby": [] },
+      "materials": { "句子": [], "诗词": [], "知识点": [] }
+    },
+    "2026-08-23": {
+      "diary": { "weather": "雷", "mood": "非常难过", "funny": "", "log": "今天从早上七点开始：早读背了《岳阳楼记》第三段，数学课讲了导数的应用，中午刷了两道压轴题，下午英语听写全对，晚自习把物理错题重新做了一遍，还整理了这个月的地理笔记，晚上九点半放学回家，路上听了半集红楼梦广播剧，感觉今天效率比昨天高了不少，明天继续保持这个节奏。睡前又规划了明天的安排，把周末要复习的科目列了一遍，觉得自己离目标又近了一步。", "tags": [] },
+      "tasks": { "study": ["导数练习"], "hobby": [] },
+      "materials": { "句子": [], "诗词": [], "知识点": ["二次函数顶点式 y=a(x-h)²+k"] }
+    },
+    "2026-08-24": {
+      "diary": { "weather": "沙尘", "mood": "emo", "funny": "测试未知枚举", "log": "今天天气很怪。", "tags": [] },
+      "tasks": { "study": [], "hobby": [] },
+      "materials": { "句子": [], "诗词": [], "知识点": [] }
+    },
+    "2026-08-25": {
+      "diary": { "weather": "雪", "mood": "不太好", "funny": "", "log": "", "tags": [] },
+      "tasks": { "study": [], "hobby": [] },
+      "materials": { "句子": [], "诗词": [], "知识点": [] }
+    },
+    "2026-08-26": {
+      "diary": { "weather": "阴", "mood": "一般", "funny": "背单词", "log": "背了 30 个单词。", "tags": [] },
+      "tasks": { "study": [], "hobby": [] },
+      "materials": { "句子": [], "诗词": ["床前明月光"], "知识点": [] }
+    },
+    "2026-08-27": {
+      "diary": { "weather": "雨", "mood": "开心", "funny": "", "log": "下雨天在家刷题。", "tags": [] },
+      "tasks": { "study": [], "hobby": [] },
+      "materials": { "句子": [], "诗词": [], "知识点": [] }
+    },
+    "2026-08-28": {
+      "diary": { "weather": "晴", "mood": "极度难过", "funny": "", "log": "考试没考好，明天继续。", "tags": [] },
+      "tasks": { "study": [], "hobby": [] },
+      "materials": { "句子": [], "诗词": [], "知识点": [] }
+    },
+    "2026-08-29": {
+      "diary": { "weather": "多云", "mood": "非常开心", "funny": "", "log": "和朋友打球。", "tags": [] },
+      "tasks": { "study": [], "hobby": [] },
+      "materials": { "句子": [], "诗词": [], "知识点": [] }
+    },
+    "2026-08-30": {
+      "diary": { "weather": "阴", "mood": "还行", "funny": "", "log": "整理错题本。", "tags": [] },
+      "tasks": { "study": [], "hobby": [] },
+      "materials": { "句子": [], "诗词": [], "知识点": [] }
+    },
+    "2026-08-31": {
+      "diary": { "weather": "晴", "mood": "开心", "funny": "", "log": "预习物理。", "tags": ["物理", "学习"] },
+      "tasks": { "study": [], "hobby": [] },
+      "materials": { "句子": [], "诗词": [], "知识点": [] }
+    },
+    "2026-09-02": {
+      "diary": { "weather": "", "mood": "", "funny": "", "log": "", "tags": [] },
+      "tasks": { "study": [], "hobby": [] },
+      "materials": { "句子": [], "诗词": [], "知识点": [] }
+    }
+  },
+  "friends": {
+    "同学": [
+      { "name": "李小明", "contact": "", "birthday": "2009-03-15", "photo": "", "personality": "开朗", "other": "" },
+      { "name": "王小红", "contact": "wxh123", "birthday": "", "photo": "", "personality": "", "other": "" },
+      { "name": "", "contact": "", "birthday": "2009-05-05", "photo": "", "personality": "", "other": "" }
+    ],
+    "家人": [
+      { "name": "妈妈", "contact": "", "birthday": "1978-11-02", "photo": "", "personality": "", "other": "" }
+    ]
+  },
+  "calendar": {
+    "2026-09-01": [
+      { "content": "开学典礼", "added_at": "2026-08-25 09:00:00" }
+    ],
+    "2026-09-05": [
+      { "content": 123, "added_at": "2026-08-26 10:00:00" },
+      { "content": "数学周测", "added_at": "2026-08-26 10:05:00" }
+    ]
+  }
+}

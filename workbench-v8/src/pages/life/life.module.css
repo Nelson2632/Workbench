@@ -1,0 +1,295 @@
+/* ============================================================
+   V9 LIFE 页面共享样式 —— 只消费 theme.css 令牌
+   （--color-* / --radius-* / --space-*），四主题自动适配
+   ============================================================ */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  max-width: 860px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  border-bottom: var(--border-width) solid var(--color-border);
+  padding-bottom: var(--space-3);
+}
+
+.tab {
+  padding: var(--space-2) var(--space-4);
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border: var(--border-width) solid transparent;
+}
+
+.tab:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface-2);
+}
+
+.tabActive {
+  color: var(--color-accent-text);
+  background: var(--color-accent-light);
+  font-weight: var(--font-weight-medium);
+}
+
+.card {
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.formRow {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.input {
+  flex: 1;
+  min-width: 160px;
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  font-family: var(--font-sans);
+}
+
+.textarea {
+  flex: 1;
+  min-height: 96px;
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  font-family: var(--font-sans);
+  resize: vertical;
+}
+
+.select {
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+}
+
+.button {
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+.button:hover {
+  filter: brightness(0.97);
+}
+
+.buttonGhost {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: var(--border-width) solid var(--color-border);
+}
+
+.buttonDanger {
+  background: transparent;
+  color: var(--color-danger);
+  border: var(--border-width) solid var(--color-danger);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.item {
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.itemHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.itemTitle {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.itemTitleDone {
+  text-decoration: line-through;
+  color: var(--color-text-tertiary);
+}
+
+.itemMeta {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.chip {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-2);
+  border: var(--border-width) solid var(--color-border-light);
+  color: var(--color-text-secondary);
+}
+
+.itemBody {
+  margin: 0;
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.itemActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.empty {
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-base);
+}
+
+/* 日历 */
+.calGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--space-2);
+}
+
+.calHead {
+  text-align: center;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  padding: var(--space-2) 0;
+}
+
+.calCell {
+  min-height: 72px;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+  text-align: left;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.calCell:hover {
+  border-color: var(--color-border-focus);
+}
+
+.calCellMuted {
+  opacity: 0.35;
+}
+
+.calCellToday {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-md);
+}
+
+.calDay {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.calDots {
+  display: flex;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+}
+
+.error {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab,
+  .button,
+  .calCell {
+    transition: none;
+  }
+}

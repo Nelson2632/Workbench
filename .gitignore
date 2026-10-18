@@ -1,0 +1,35 @@
+# ---- 本机工具链与缓存（体积大、可重建，不进仓库） ----
+.toolchain/
+.npm-cache/
+.build-logs/
+*.log
+
+# ---- 本地归档（含 workbench-v8 的旧 git 历史备份） ----
+.archive/
+
+# ---- 个人数据（真实日记 / 好友 / 时间线备份，严禁入库） ----
+数据迁移_应用数据/
+PrivateWorkbench/
+*.snapshot.json
+
+# ---- 前端构建产物与依赖 ----
+node_modules/
+dist/
+dist-ssr/
+.vite/
+*.local
+
+# ---- Tauri / Rust 构建产物 ----
+src-tauri/target/
+src-tauri/gen/
+**/target/
+Cargo.lock.bak
+
+# ---- 系统与编辑器 ----
+.DS_Store
+**/.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.swp

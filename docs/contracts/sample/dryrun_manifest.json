@@ -1,0 +1,20 @@
+{
+  "runId": "v9-dryrun-0001",
+  "mode": "dry",
+  "wroteToDb": false,
+  "generatedAt": "2026-08-30T00:00:00.000Z",
+  "sourceFile": "legacy_mydiary_sample.json",
+  "counts": {
+    "diaries": 10,
+    "materials": 3,
+    "friends": 3,
+    "events": 2,
+    "sourceCount": 20,
+    "targetCount": 18,
+    "failedCount": 3,
+    "skippedCount": 2
+  },
+  "checksum": "sha256:13ea94c39447fe32220cd5cd4d4817de22fb16d92fdabedbb43f380a5d17e30a",
+  "verified": true,
+  "note": "Dry Run 零写入；稳定字段口径与 expected_migration_export.json 一致"
+}

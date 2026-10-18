@@ -1,0 +1,36 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: var(--header-h); /* A1.1 Header 64px（范围 56~72px）*/
+  margin-bottom: 24px;
+}
+
+.titleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.description {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 6px 0 0;
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}

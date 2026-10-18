@@ -1,0 +1,359 @@
+/* ============================================================
+   PlanPage — 共享计划页面样式（TodayPlanPage / InboxPage）
+   ============================================================ */
+
+/* ---- Quick Add Input ---- */
+
+.quickAdd {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.quickAdd input {
+  flex: 1;
+}
+
+/* ---- Filter Tabs ---- */
+
+.filters {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  width: fit-content;
+  margin-bottom: 16px;
+}
+
+.filterTab {
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  border-radius: calc(var(--radius-md) - 4px);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.filterTab:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface-2);
+}
+
+.filterTabActive {
+  color: var(--color-accent-text);
+  background: var(--color-accent);
+}
+
+.filterTabActive:hover {
+  color: var(--color-accent-text);
+  background: var(--color-accent-hover);
+}
+
+/* ---- Task List ---- */
+
+.taskList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.taskItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: box-shadow var(--transition-fast);
+}
+
+.taskItem:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.taskItemCompleted {
+  opacity: 0.55;
+}
+
+/* ---- Checkbox ---- */
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-border);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+  padding: 0;
+}
+
+.checkbox:hover {
+  border-color: var(--color-accent);
+}
+
+.checked {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.checkmark {
+  display: none;
+}
+
+.checked .checkmark {
+  display: block;
+  width: 6px;
+  height: 10px;
+  border: solid var(--color-text-inverse);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-top: -2px;
+}
+
+/* ---- Task Title ---- */
+
+.taskTitle {
+  flex: 1;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+  min-width: 0;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background var(--transition-fast);
+}
+
+.taskTitle:hover {
+  background: var(--color-surface-2);
+}
+
+.taskTitleDone {
+  text-decoration: line-through;
+  color: var(--color-text-tertiary);
+}
+
+/* ---- Inline Edit ---- */
+
+.inlineEdit {
+  flex: 1;
+  min-width: 0;
+}
+
+.inlineEdit input {
+  width: 100%;
+  padding: 4px 8px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-focus);
+  border-radius: 4px;
+  outline: none;
+  line-height: 1.4;
+}
+
+/* ---- Task Actions ---- */
+
+.priorityCycle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  border-radius: 4px;
+  transition: outline var(--transition-fast), transform var(--transition-fast);
+}
+
+.priorityCycle:hover {
+  outline: 1.5px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.priorityCycle:active {
+  transform: scale(0.96);
+}
+
+.taskActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.actionBtn:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+.pinBtn {
+  color: var(--color-text-tertiary);
+}
+
+.pinBtnActive {
+  color: var(--color-accent);
+}
+
+.deleteBtn:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+/* ---- Section Label ---- */
+
+.sectionLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  margin: 20px 0 8px;
+  text-transform: none;
+  letter-spacing: 0.2px;
+}
+
+/* ---- Loading ---- */
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--color-text-tertiary);
+  font-size: 14px;
+}
+
+/* ---- Inbox extras ---- */
+
+.inboxInput {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.inboxInput input {
+  flex: 1;
+}
+
+.inboxList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inboxItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: box-shadow var(--transition-fast);
+}
+
+.inboxItem:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.inboxItemTitle {
+  flex: 1;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inboxItemActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.inboxActionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.inboxActionBtn:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+.inboxDeleteBtn:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.datePickerOverlay {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.datePickerOverlay label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.datePickerOverlay input[type="date"] {
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.datePickerOverlay input[type="date"]:focus {
+  border-color: var(--color-border-focus);
+}
+
+.dateActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}

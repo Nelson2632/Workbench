@@ -1,0 +1,25 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.description {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.criticalNote {
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--color-danger);
+  background: var(--color-danger-light);
+  border-radius: var(--radius-sm);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

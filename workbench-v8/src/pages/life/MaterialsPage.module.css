@@ -1,0 +1,188 @@
+.page {
+  padding: 0 24px 24px;
+}
+
+.loading {
+  text-align: center;
+  color: var(--color-text-tertiary);
+  padding: 48px 0;
+  font-size: 14px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.titleRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-text-primary);
+  word-break: break-word;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sourceDate {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  font-size: 12px;
+  color: var(--color-accent);
+}
+
+/* Form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.input {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.input:focus {
+  border-color: var(--color-border-focus);
+}
+
+.textarea {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  transition: border-color var(--transition-fast);
+}
+
+.textarea:focus {
+  border-color: var(--color-border-focus);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+/* 分类筛选 */
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.filterLabel {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.filterSelect {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  outline: none;
+  min-width: 160px;
+  transition: border-color var(--transition-fast);
+}
+
+.filterSelect:focus {
+  border-color: var(--color-border-focus);
+}
+
+/* 附件引用 */
+.fileRefs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.fileRef {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-2);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  word-break: break-all;
+}
