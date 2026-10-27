@@ -22,11 +22,19 @@
 .
 ├── workbench-v8/            # 全部源码（前端 src/ + Tauri 壳层 src-tauri/）
 ├── docs/                    # 设计合订本、可机器校验的契约、macOS 构建手册
+│   ├── USER_MOTIVATION_LOOPS_PLAN.md  # 用户积极性四闭环目标与实现路线
+│   └── experiments/
+│       └── motion-lab.html  # 四主题交互动画实验室（独立原型）
 ├── scripts/                 # 契约门禁 / 实现门禁脚本
 ├── build-mac.sh             # macOS 一键构建（.app + .dmg）
 ├── 项目概览.md               # 一页纸项目速览（架构 / 功能 / 边界）
 └── 先读我-Mac移植说明.md      # 迁移包说明与上手步骤
 ```
+
+## 用户积极性优化计划
+
+- [四闭环优化计划](docs/USER_MOTIVATION_LOOPS_PLAN.md)：Start / Complete / Recover / Memory 的产品目标、工程约束、路线图和测试矩阵。
+- [四主题动画实验室](docs/experiments/motion-lab.html)：可直接在浏览器打开的独立交互原型，仅用于体验和视觉验证，不连接真实数据层。
 
 ## 构建（macOS）
 
