@@ -1,5 +1,6 @@
 import { isActiveTask } from '@/domain/planning/taskLifecycle'
 import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { db } from '@/db/database'
 import { isDesktop, isQuickMemoWindow, sendDesktopNotification } from '@/desktop'
 import { formatDate } from '@/utils/helpers'
@@ -24,7 +25,7 @@ export interface NotificationSettings {
 }
 
 export const DEFAULT_SETTINGS: NotificationSettings = {
-  reviewReminderEnabled: true,
+  reviewReminderEnabled: false,
   reviewReminderTime: '21:00',
   recurringReminderEnabled: true,
   recurringReminderTime: '09:00',
@@ -65,21 +66,15 @@ function isPastTime(hhmm: string, now: Date): boolean {
   return now.getHours() > h || (now.getHours() === h && now.getMinutes() >= m)
 }
 
-async function checkDailyReviewReminder(settings: NotificationSettings): Promise<void> {
+export async function checkDailyReviewReminder(settings: NotificationSettings): Promise<void> {
   if (!settings.reviewReminderEnabled || !isPastTime(settings.reviewReminderTime, new Date())) return
   const key = 'daily-review'
   if (alreadyNotifiedToday(key)) return
 
   const today = formatDate(new Date())
-  const dailyReviews = await db.reviewEntries
-    .filter((r) => r.type === 'daily' && r.dateRange.start <= today && r.dateRange.end >= today)
-    .count()
-
-  if (dailyReviews === 0) {
-    await sendDesktopNotification(
-      '今日复盘待完成',
-      '今天还没有写复盘，花 5 分钟回顾一下今天吧。',
-    )
+  const shutdown = await db.nightShutdown.where('date').equals(today).first()
+  if (!shutdown) {
+    await sendDesktopNotification('今天要收尾了吗？', '可以简单收口，也可以留到稍后。', '/today/night-shutdown')
   }
   markNotifiedToday(key)
 }
@@ -176,6 +171,20 @@ async function checkEventReminders(): Promise<void> {
  * while the desktop app is resident (tray keeps the process alive).
  */
 export function useDesktopNotifications(): void {
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (!isDesktop() || isQuickMemoWindow()) return
+    let disposed = false
+    let remove: (() => void) | undefined
+    void import('@tauri-apps/plugin-notification').then(async ({ onAction }) => {
+      const listener = await onAction(notification => {
+        if (notification.extra?.route === '/today/night-shutdown') navigate('/today/night-shutdown')
+      })
+      if (disposed) listener.unregister()
+      else remove = () => listener.unregister()
+    }).catch(err => console.warn('[Notifications] action listener unavailable', err))
+    return () => { disposed = true; remove?.() }
+  }, [navigate])
   useEffect(() => {
     // Only run in the desktop shell's main window
     if (!isDesktop() || isQuickMemoWindow()) return

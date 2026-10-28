@@ -4,7 +4,7 @@
 // 反思不写入 Daily Memory（Patch C-002-08 职责边界）
 // ============================================================
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useRef } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useNightShutdownStore } from '@/stores/nightShutdownStore'
@@ -24,6 +24,8 @@ export default function NightShutdownPage() {
   const [reflection, setReflection] = useState('')
   const [tomorrowFocus, setTomorrowFocus] = useState('')
   const [error, setError] = useState('')
+  const [saving, setSaving] = useState(false)
+  const pending = useRef(false)
 
   useEffect(() => {
     void loadByDate(today)
@@ -32,12 +34,11 @@ export default function NightShutdownPage() {
   const handleComplete = useCallback(
     async (e: FormEvent) => {
       e.preventDefault()
-      if (!reflection.trim()) {
-        setError('写一句今天的反思吧（一句话即可）')
-        return
-      }
+      if (pending.current) return
+      pending.current = true
+      setSaving(true)
       setError('')
-      await complete({
+      try { await complete({
         date: today,
         reason: reason.trim(),
         reflection: reflection.trim(),
@@ -45,7 +46,8 @@ export default function NightShutdownPage() {
           .split(/[,，\n]+/)
           .map((s) => s.trim())
           .filter(Boolean),
-      })
+      }) } catch { setError('保存失败，文字已保留，请重试') }
+      finally { pending.current = false; setSaving(false) }
     },
     [complete, reason, reflection, today, tomorrowFocus],
   )
@@ -73,7 +75,7 @@ export default function NightShutdownPage() {
             </>
           )}
           <h3 className={styles.cardTitle}>反思</h3>
-          <p className={styles.itemBody}>{current.reflection}</p>
+          <p className={styles.itemBody}>{current.reflection || '今天到这里就好。'}</p>
           {current.tomorrowFocus.length > 0 && (
             <>
               <h3 className={styles.cardTitle}>明日重点</h3>
@@ -160,7 +162,7 @@ export default function NightShutdownPage() {
           className={styles.textarea}
           value={reflection}
           onChange={(e) => setReflection(e.target.value)}
-          placeholder="今天怎么样？一句话反思（必填）"
+          placeholder="今天怎么样？想写再写（可选）"
           aria-label="今日反思"
         />
         <input
@@ -171,7 +173,7 @@ export default function NightShutdownPage() {
           aria-label="明日重点"
         />
         <div className={styles.formRow}>
-          <button type="submit" className={styles.button}>完成收口</button>
+          <button type="submit" className={styles.button} disabled={saving}>{saving ? '保存中…' : '完成收口'}</button>
         </div>
         {error && <p className={styles.error} role="alert">{error}</p>}
       </form>

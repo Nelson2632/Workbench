@@ -6,7 +6,7 @@ import { timestampDay, formatDate } from '@/utils/helpers'
 // ============================================================
 
 import { db } from '@/db/database'
-import { eventBus } from '@/domain/events/eventBus'
+import { eventBus, isCriticalOwned, type AppEvent } from '@/domain/events/eventBus'
 import type { DailyMemory, DailyMemoryFacts } from '@/types'
 
 const EMPTY_FACTS: DailyMemoryFacts = {
@@ -113,9 +113,11 @@ export function refreshDailyMemory(date: string): Promise<DailyMemory> {
 
 /** 人类反思：唯一写入 reflection 的入口（人书写，机器永不覆盖）。Background 直写路径。 */
 export async function setDailyReflection(date: string, text: string): Promise<DailyMemory> {
-  const existing = await getDailyMemory(date)
-  const facts = existing?.facts ?? (await aggregateDailyMemoryFacts(date))
-  return upsertDailyMemoryRow(date, facts, text, existing ? existing.lastAutoUpdate : new Date().toISOString())
+  const initialFacts = await aggregateDailyMemoryFacts(date)
+  return db.transaction('rw', db.dailyMemory, async () => {
+    const existing = await getDailyMemory(date)
+    return upsertDailyMemoryRow(date, existing?.facts ?? initialFacts, text, existing?.lastAutoUpdate ?? new Date().toISOString())
+  })
 }
 
 export async function getDailyMemory(date: string): Promise<DailyMemory | null> {
@@ -132,17 +134,46 @@ export function _resetDailyMemoryForTests(): void {
   initialized = false
 }
 
+const pendingRefreshes = new Set<Promise<unknown>>()
+export async function flushDailyMemoryEvents(): Promise<void> {
+  while (pendingRefreshes.size) await Promise.allSettled([...pendingRefreshes])
+}
+
+async function refreshForEvent(event: AppEvent) {
+  const dates = new Set([formatDate(new Date())])
+  const mappings: Record<string, [string, string]> = {
+    task: ['tasks', 'taskId'], studySession: ['studySessions', 'sessionId'],
+    diary: ['diaries', 'diaryId'], lifeMoment: ['lifeMoments', 'lifeMomentId'],
+    event: ['events', 'eventId'], anime: ['anime', 'animeId'],
+    game: ['gameRecords', 'recordId'], music: ['music', 'musicId'], mistake: ['mistakes', 'mistakeId'],
+  }
+  const mapping = mappings[event.type.split('.')[0]]
+  const payload = event as unknown as Record<string, unknown>
+  if (mapping && payload[mapping[1]] !== undefined) {
+    const row = await db.table(mapping[0]).get(payload[mapping[1]] as string | number)
+    if (row) {
+      if (row.date) dates.add(row.date)
+      for (const key of ['completedAt', 'occurredAt', 'endedAt', 'masteredAt']) if (row[key]) dates.add(timestampDay(row[key]))
+      for (const entry of row.episodeLog ?? []) dates.add(entry.date)
+    }
+  }
+  if ('date' in event) dates.add(event.date)
+  // Changed dates and removed sources no longer carry their previous date. Refresh
+  // materialized memories so old days cannot keep stale counts.
+  if (/\.(updated|deleted)$/.test(event.type) || event.type === 'timeline.rebuilt' || event.type === 'restore.completed') {
+    for (const row of await db.dailyMemory.toArray()) dates.add(row.date)
+  }
+  for (const date of dates) if (date) await refreshDailyMemory(date)
+}
 export function setupDailyMemory(): void {
   if (initialized) return
   initialized = true
-  // nightShutdown.completed → 刷新当日 Facts
-  eventBus.subscribe('nightShutdown.completed', (e) => {
-    void refreshDailyMemory(e.date).catch((err) => console.error('[DailyMemory] refresh failed:', err))
-  })
-  // timeline.rebuilt → 刷新当日 Facts
-  eventBus.subscribe('timeline.rebuilt', () => {
-    const today = formatDate(new Date())
-    void refreshDailyMemory(today).catch((err) => console.error('[DailyMemory] refresh failed:', err))
+  eventBus.subscribeAll(event => {
+    if (isCriticalOwned(event)) return
+    if (!/^(task|studySession|pomodoro|flashcard|mistake|diary|lifeMoment|event|anime|game|gameRecord|music|nightShutdown)\./.test(event.type) && event.type !== 'timeline.rebuilt' && event.type !== 'restore.completed') return
+    const job = refreshForEvent(event).catch(err => console.error('[DailyMemory] refresh failed:', err))
+    pendingRefreshes.add(job)
+    void job.finally(() => pendingRefreshes.delete(job))
   })
 }
 

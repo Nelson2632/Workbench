@@ -29,6 +29,7 @@ const PlayLayout = lazy(() => import('@/pages/play/PlayLayout'))
 const AnimePage = lazy(() => import('@/pages/play/AnimePage'))
 const GamesPage = lazy(() => import('@/pages/play/GamesPage'))
 const MusicPage = lazy(() => import('@/pages/play/MusicPage'))
+const SourceRecordPage = lazy(() => import('@/pages/cross/SourceRecordPage'))
 const TimelinePage = lazy(() => import('@/pages/cross/TimelinePage'))
 const DailyMemoryPage = lazy(() => import('@/pages/cross/DailyMemoryPage'))
 const CollectionPage = lazy(() => import('@/pages/cross/CollectionPage'))
@@ -168,6 +169,7 @@ function AppInner() {
               <Route path="music" element={<PageWrap><MusicPage /></PageWrap>} />
             </Route>
 
+            <Route path="source/:type/:id" element={<PageWrap><SourceRecordPage /></PageWrap>} />
             <Route path="timeline" element={<PageWrap><TimelinePage /></PageWrap>} />
             <Route path="memory" element={<PageWrap><DailyMemoryPage /></PageWrap>} />
             <Route path="collection" element={<PageWrap><CollectionPage /></PageWrap>} />
