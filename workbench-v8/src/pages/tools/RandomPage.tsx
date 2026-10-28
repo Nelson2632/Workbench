@@ -1,3 +1,4 @@
+import { isActiveTask } from '@/domain/planning/taskLifecycle'
 import { useState, useCallback, useMemo } from 'react'
 import PageHeader from '@/components/layout/PageHeader'
 import Button from '@/components/ui/Button'
@@ -73,7 +74,7 @@ export default function RandomPage() {
     return result
   }, [subjects])
 
-  const undoneTasks = useMemo(() => tasks.filter((t) => !t.done), [tasks])
+  const undoneTasks = useMemo(() => tasks.filter((t) => !t.done && isActiveTask(t)), [tasks])
 
   const handleRandomSelect = useCallback(() => {
     const lines = options

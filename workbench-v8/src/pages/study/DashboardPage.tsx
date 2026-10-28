@@ -1,3 +1,4 @@
+import { isActiveTask } from '@/domain/planning/taskLifecycle'
 import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ReactEChartsCore from 'echarts-for-react/esm/core'
@@ -68,7 +69,7 @@ export default function DashboardPage() {
 
   // --- Today's study tasks ---
   const todayTasks = useMemo(
-    () => tasks.filter((t) => t.dueDate === todayStr && !t.done),
+    () => tasks.filter((t) => t.dueDate === todayStr && !t.done && isActiveTask(t)),
     [tasks, todayStr],
   )
 

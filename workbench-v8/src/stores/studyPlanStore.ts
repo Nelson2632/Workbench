@@ -1,3 +1,4 @@
+import { isActiveTask } from '@/domain/planning/taskLifecycle'
 // ============================================================
 // V9 WORK — Flex Study 计划项 Store（V9-C-001 §4.15 / V9-C-004）
 // 引用 tasks.id（string，直引不转换）；默认建议映射 P0→must 等
@@ -60,7 +61,7 @@ export const useStudyPlanStore = create<StudyPlanState>((set, get) => ({
   /** 从今日任务生成计划项（幂等：同 taskId+planDate 已存在则跳过）；返回新增数 */
   generateFromTasks: async (date) => {
     const tasks = await db.tasks.where('dueDate').equals(date).toArray()
-    const openTasks = tasks.filter((t) => !t.done)
+    const openTasks = tasks.filter((t) => !t.done && isActiveTask(t))
     const existing = await db.studyPlanItems.where('planDate').equals(date).toArray()
     const existingKeys = new Set(existing.map((e) => `${e.taskId}`))
 

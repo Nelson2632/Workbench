@@ -1,3 +1,4 @@
+import { isActiveTask } from '@/domain/planning/taskLifecycle'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useReliableCapture } from '@/hooks/useReliableCapture'
 import { selectTodayNarrative } from '@/domain/planning/todayNarrative'
@@ -92,7 +93,7 @@ export default function TodayPage() {
   // ---- Today's tasks (not done) ----
   const todayTasks = useMemo(() => {
     return tasks
-      .filter((t) => t.dueDate === today && !t.done)
+      .filter((t) => t.dueDate === today && !t.done && isActiveTask(t))
       .sort((a, b) => {
         const pa = PRIORITY_ORDER[a.priority] ?? 99
         const pb = PRIORITY_ORDER[b.priority] ?? 99
@@ -106,7 +107,7 @@ export default function TodayPage() {
   // 昨天没做完的自动滚到今天（置顶提醒 + 一键顺延），不会凭空消失
   const overdueTasks = useMemo(() => {
     return tasks
-      .filter((t) => !t.done && t.dueDate && t.dueDate < today)
+      .filter((t) => !t.done && isActiveTask(t) && t.dueDate && t.dueDate < today)
       .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
   }, [tasks, today])
 
@@ -335,13 +336,14 @@ export default function TodayPage() {
       {/* ===== 今天要处理（逾期置顶，标红 + 一键顺延/完成） ===== */}
       {overdueTasks.length > 0 && (
         <section className={styles.overdueSection} aria-label="今天要处理">
-          <div className={styles.overdueLabel}>今天要处理 · {overdueTasks.length} 项逾期</div>
+          <div className={styles.overdueLabel}>可以重新安排 · {overdueTasks.length} 项</div>
+          <button type="button" onClick={() => navigate('/plan/today#recover')}>延期、拆分或暂存</button>
           <ul className={styles.taskList}>
             {overdueTasks.map((task) => {
               const days = getDaysDiff(task.dueDate, today)
               return (
                 <li key={task.id} className={styles.overdueItem}>
-                  <span className={styles.overdueBadge}>逾期 {days} 天</span>
+                  <span className={styles.overdueBadge}>原计划在 {days} 天前</span>
                   <span className={styles.taskTitle}>{task.title}</span>
                   <button
                     type="button"
