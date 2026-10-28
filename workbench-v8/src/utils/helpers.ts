@@ -26,6 +26,12 @@ export function isToday(date: string): boolean {
   return date === formatDate(new Date())
 }
 
+/** Absolute timestamp → local business day. Date-only fields must not use this. */
+export function timestampDay(iso: string): string {
+  const date = new Date(iso)
+  return Number.isNaN(date.getTime()) ? '' : formatDate(date)
+}
+
 /** Return a Chinese greeting based on the current hour */
 export function getGreeting(): string {
   const h = new Date().getHours()

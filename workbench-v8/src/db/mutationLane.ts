@@ -6,8 +6,9 @@
 
 import { db } from '@/db/database'
 import { faultInjection } from '@/utils/faultInjection'
-import { eventBus, markJournaled, type AppEvent } from '@/domain/events/eventBus'
+import { eventBus, markJournaled, markCriticalOwned, type AppEvent } from '@/domain/events/eventBus'
 import type { Table } from 'dexie'
+import type { SystemCommandId } from '@/types'
 
 // ---------- FIFO 串行队列（R6-03：concurrency=1，order=FIFO） ----------
 
@@ -47,11 +48,15 @@ export interface RunCommandOptions<T> {
   events?: (result: T) => AppEvent[]
   /** 提交后回调（更新 UI state 等；发布事件由 events 统一走 lane） */
   afterCommit?: (result: T) => void | Promise<void>
+  /** Opt-in derived writes only: MUST NOT enqueue another Mutation Lane command. */
+  projectionRecovery?: SystemCommandId['projectionRecovery']
+  projectCritical?: (events: AppEvent[], result: T) => Promise<void>
 }
 
 export interface RunCommandResult<T> {
   result: T | null
   deduped: boolean
+  projection?: 'projected' | 'pending'
 }
 
 /**
@@ -93,6 +98,7 @@ export async function runCommand<T>(opts: RunCommandOptions<T>): Promise<RunComm
         commandType: opts.commandType,
         commandId: opts.commandId,
         processedAt: new Date().toISOString(),
+        projectionRecovery: opts.projectionRecovery,
       })
       if (hasEvents) {
         events = opts.events!(result)
@@ -109,17 +115,30 @@ export async function runCommand<T>(opts: RunCommandOptions<T>): Promise<RunComm
     })
     await faultInjection.fire('after_domain_commit')
 
-    // Post-commit（MUST-02）：DB 已提交 ⇒ 命令即成功；此处任何异常仅隔离记录，绝不 reject。
+    // UI failure must not suppress event dispatch or turn a committed write into a failure.
     try {
       await opts.afterCommit?.(result)
-      for (const event of events) {
-        eventBus.publish(markJournaled(event))
-      }
     } catch (err) {
       console.error('[MutationLane] post-commit error (ignored):', err)
     }
 
-    return { result, deduped: false }
+    let projection: 'projected' | 'pending' | undefined
+    if (opts.projectCritical) {
+      try {
+        await opts.projectCritical(events, result)
+        await db.systemCommandIds.update(commandKey(opts.commandType, opts.commandId), { projectionRecovery: undefined })
+        projection = 'projected'
+      } catch (err) {
+        projection = 'pending'
+        console.error('[MutationLane] committed; critical projection pending:', err)
+      }
+    }
+    for (const event of events) {
+      if (opts.projectCritical) markCriticalOwned(event)
+      eventBus.publish(markJournaled(event))
+    }
+
+    return { result, deduped: false, projection }
   })
 }
 

@@ -136,6 +136,17 @@ class EventBus {
 
 export const eventBus = new EventBus()
 
+// Only the opt-in command coordinator owns these projections. Other subscribers
+// (notifications, collection, etc.) still receive the ordinary domain event.
+const CRITICAL_OWNED = Symbol('critical-projection-owned')
+export function markCriticalOwned(event: AppEvent): AppEvent {
+  Object.defineProperty(event, CRITICAL_OWNED, { value: true })
+  return event
+}
+export function isCriticalOwned(event: AppEvent): boolean {
+  return (event as unknown as Record<symbol, unknown>)[CRITICAL_OWNED] === true
+}
+
 // ---------- Journal 已落库标记（R6-06 v1.7） ----------
 // Mutation Lane 在事务内已把领域事件写入 operationJournal，提交后再发布。
 // 用非枚举 Symbol 标记，避免 Journal sink 二次汇流写入；不影响 { ...event } 展开与 payload 派生。

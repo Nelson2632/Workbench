@@ -1,3 +1,4 @@
+import { timestampDay, formatDate } from '@/utils/helpers'
 // ============================================================
 // V9 CROSS DOMAIN — Daily Memory Aggregator（V9-C-002 §6）
 // Facts 机器派生可重建；Reflection 人类书写，聚合器永不写入
@@ -18,7 +19,7 @@ const EMPTY_FACTS: DailyMemoryFacts = {
 }
 
 function isSameDay(iso: string, date: string): boolean {
-  return iso.slice(0, 10) === date
+  return timestampDay(iso) === date
 }
 
 /** Facts 派生查询（V9-C-002 §6.2，全部可重建） */
@@ -39,7 +40,7 @@ export async function aggregateDailyMemoryFacts(date: string): Promise<DailyMemo
       db.nightShutdown.where('date').equals(date).first(),
     ])
 
-  const tasksCompleted = tasks.filter((t) => t.done && (t as any).completedAt && isSameDay((t as any).completedAt, date)).length
+  const tasksCompleted = tasks.filter((t) => t.done && t.completedAt && isSameDay(t.completedAt, date)).length
 
   let studyMinutes = studySessions.filter((s) => isSameDay(s.endedAt, date)).reduce((s, x) => s + x.duration, 0)
   if (studyMinutes === 0) {
@@ -95,10 +96,19 @@ export async function upsertDailyMemoryRow(
  * 刷新 Facts（聚合器只写 facts + lastAutoUpdate，绝不写 reflection，V9-C-002 §6.3 硬规则）。
  * Background 直写路径（事件驱动重建），亦供 Store 手动刷新复用。
  */
-export async function refreshDailyMemory(date: string): Promise<DailyMemory> {
-  const facts = await aggregateDailyMemoryFacts(date)
-  const existing = await getDailyMemory(date)
-  return upsertDailyMemoryRow(date, facts, existing?.reflection ?? '', new Date().toISOString())
+let refreshTail: Promise<unknown> = Promise.resolve()
+export function refreshDailyMemory(date: string): Promise<DailyMemory> {
+  const job = refreshTail.then(async () => {
+    const facts = await aggregateDailyMemoryFacts(date)
+    // Read reflection at write time, atomically, so auto-refresh never overwrites
+    // human input saved while aggregation was running.
+    return db.transaction('rw', db.dailyMemory, async () => {
+      const existing = await getDailyMemory(date)
+      return upsertDailyMemoryRow(date, facts, existing?.reflection ?? '', new Date().toISOString())
+    })
+  })
+  refreshTail = job.catch(() => undefined)
+  return job
 }
 
 /** 人类反思：唯一写入 reflection 的入口（人书写，机器永不覆盖）。Background 直写路径。 */
@@ -131,7 +141,7 @@ export function setupDailyMemory(): void {
   })
   // timeline.rebuilt → 刷新当日 Facts
   eventBus.subscribe('timeline.rebuilt', () => {
-    const today = new Date().toISOString().slice(0, 10)
+    const today = formatDate(new Date())
     void refreshDailyMemory(today).catch((err) => console.error('[DailyMemory] refresh failed:', err))
   })
 }

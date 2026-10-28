@@ -339,6 +339,7 @@ export interface OperationJournalEntry {
 }
 
 export interface SystemCommandId {
+  projectionRecovery?: { taskId: string; desiredDone: boolean; dates: string[] }
   id: string // `${commandType}:${commandId}`
   commandType: string
   commandId: string
@@ -348,6 +349,7 @@ export interface SystemCommandId {
 export type InboxItemStatus = 'new' | 'triaged' | 'converted' | 'discarded'
 
 export interface InboxItem {
+  sourceCommandId?: string
   id: number
   title: string
   note: string

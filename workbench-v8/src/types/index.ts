@@ -19,6 +19,7 @@ export interface Task {
   title: string
   priority: TaskPriority
   done: boolean
+  completedAt?: string | null
   note: string
   projectId: string
   dueDate: string

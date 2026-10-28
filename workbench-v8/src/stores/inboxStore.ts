@@ -15,7 +15,7 @@ interface InboxState {
   loading: boolean
 
   loadInbox: () => Promise<void>
-  addItem: (title: string) => Promise<number | null>
+  addItem: (title: string, commandId?: string) => Promise<number | null>
   updateItem: (id: number, updates: Partial<InboxItem>) => Promise<void>
   discardItem: (id: number) => Promise<void>
   deleteItem: (id: number) => Promise<void>
@@ -37,10 +37,11 @@ export const useInboxStore = create<InboxState>((set) => ({
     }
   },
 
-  addItem: async (title) => {
+  addItem: async (title, commandId = 'cmd_' + uid()) => {
     const now = new Date().toISOString()
     const row: Omit<InboxItem, 'id'> = {
       title,
+      sourceCommandId: commandId,
       note: '',
       status: 'new',
       sourceTaskId: null,
@@ -49,14 +50,21 @@ export const useInboxStore = create<InboxState>((set) => ({
     }
     const { result } = await runCommand<number>({
       commandType: 'inbox.add',
-      commandId: 'cmd_' + uid(),
+      commandId,
       tables: ['inboxItems'],
-      mutate: async () => db.inboxItems.add(row),
+      mutate: async () => {
+        const existing = await db.inboxItems.filter((item) => item.sourceCommandId === commandId).first()
+        return existing?.id ?? db.inboxItems.add(row)
+      },
       afterCommit: (id) => {
-        set((s) => ({ items: [{ ...row, id }, ...s.items] }))
+        set((s) => ({ items: [{ ...row, id }, ...s.items.filter((item) => item.id !== id)] }))
       },
     })
-    return result
+    if (result != null) return result
+    const recovered = await db.inboxItems.filter((item) => item.sourceCommandId === commandId).first()
+    if (!recovered) throw new Error('保存结果无法确认，请检查收件箱')
+    await useInboxStore.getState().loadInbox()
+    return recovered.id
   },
 
   updateItem: async (id, updates) => {

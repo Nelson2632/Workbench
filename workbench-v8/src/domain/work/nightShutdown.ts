@@ -1,3 +1,4 @@
+import { timestampDay } from '@/utils/helpers'
 // ============================================================
 // V9 WORK — Night Shutdown 聚合（V9_MASTER_PLAN §9 / V9-C-002 §6.5）
 // 操作收口：聚合今日任务/学习/错题/闪卡/日历/日记/PLAY
@@ -22,7 +23,7 @@ export interface ShutdownAggregate {
 }
 
 function isSameDay(iso: string, date: string): boolean {
-  return iso.slice(0, 10) === date
+  return timestampDay(iso) === date
 }
 
 /** 聚合某日各域事实（只读事实表；确定性，可反复调用） */
@@ -42,7 +43,7 @@ export async function aggregateNightShutdown(date: string): Promise<ShutdownAggr
     ])
 
   const completed = tasks
-    .filter((t) => t.done && (t as any).completedAt && isSameDay((t as any).completedAt, date))
+    .filter((t) => t.done && t.completedAt && isSameDay(t.completedAt, date))
     .map((t) => ({ id: t.id, title: t.title }))
   const unfinished = tasks
     .filter((t) => !t.done && t.dueDate === date)

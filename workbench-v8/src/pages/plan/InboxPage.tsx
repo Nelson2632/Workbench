@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, type KeyboardEvent, type ChangeEvent } from 'react'
+import { useReliableCapture } from '@/hooks/useReliableCapture'
 import PageHeader from '@/components/layout/PageHeader'
 import { useInboxStore, convertInboxItemToTask } from '@/stores/inboxStore'
 import { useProjectStore } from '@/stores/projectStore'
@@ -18,7 +19,8 @@ export default function InboxPage() {
   const addRecurring = useRecurringStore((s) => s.addRecurring)
   const addMaterial = useMaterialStore((s) => s.addMaterial)
 
-  const [inputValue, setInputValue] = useState('')
+  const capture = useReliableCapture(addItem)
+  const { value: inputValue, setValue: setInputValue } = capture
 
   // 转为计划编辑器：Inbox Item → Task（转换幂等，sourceTaskId 记录产物）
   const [planEditorItemId, setPlanEditorItemId] = useState<number | null>(null)
@@ -38,12 +40,7 @@ export default function InboxPage() {
 
   const inboxItems = useMemo(() => items, [items])
 
-  const handleAdd = () => {
-    const title = inputValue.trim()
-    if (!title) return
-    addItem(title)
-    setInputValue('')
-  }
+  const handleAdd = () => { void capture.submit() }
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -141,11 +138,13 @@ export default function InboxPage() {
           placeholder="快速记录想法，按 Enter 添加..."
           aria-label="新增任务"
         />
-        <Button variant="primary" size="sm" onClick={handleAdd} disabled={!inputValue.trim()}>
+        <Button variant="primary" size="sm" onClick={handleAdd} disabled={capture.pending || !inputValue.trim()}>
           添加
         </Button>
       </div>
 
+      {capture.error && <p role="alert">{capture.error} <button onClick={handleAdd}>重试保存</button></p>}
+      {capture.pending && <p role="status">正在保存…</p>}
       {loading ? (
         <div style={{ textAlign: 'center', padding: 40, color: 'var(--color-text-tertiary)' }}>加载中...</div>
       ) : inboxItems.length === 0 ? (
