@@ -1,3 +1,4 @@
+import { isActiveTask } from '@/domain/planning/taskLifecycle'
 import { useEffect } from 'react'
 import { db } from '@/db/database'
 import { isDesktop, isQuickMemoWindow, sendDesktopNotification } from '@/desktop'
@@ -90,7 +91,7 @@ async function checkRecurringReminder(settings: NotificationSettings): Promise<v
 
   const today = formatDate(new Date())
   const pending = await db.tasks
-    .filter((t) => t.sourceRecurringId !== undefined && t.dueDate === today && !t.done)
+    .filter((t) => t.sourceRecurringId !== undefined && t.dueDate === today && !t.done && isActiveTask(t))
     .count()
 
   if (pending > 0) {

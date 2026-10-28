@@ -1,3 +1,4 @@
+import { isActiveTask } from '@/domain/planning/taskLifecycle'
 import { useEffect, useMemo } from 'react'
 import PageHeader from '@/components/layout/PageHeader'
 import EmptyState from '@/components/ui/EmptyState'
@@ -15,7 +16,7 @@ export default function FuturePage() {
 
   const futureTasks = useMemo(() => {
     const today = formatDate(new Date())
-    return sortTasks(tasks.filter((t) => !t.done && t.dueDate && t.dueDate > today))
+    return sortTasks(tasks.filter((t) => !t.done && isActiveTask(t) && t.dueDate && t.dueDate > today))
   }, [tasks])
 
   return (

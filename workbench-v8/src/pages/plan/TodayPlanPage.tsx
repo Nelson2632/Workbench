@@ -1,3 +1,5 @@
+import TaskRecovery from '@/components/plan/TaskRecovery'
+import { isActiveTask } from '@/domain/planning/taskLifecycle'
 import { useEffect, useState, useMemo } from 'react'
 import PageHeader from '@/components/layout/PageHeader'
 import { useTaskStore } from '@/stores/taskStore'
@@ -51,7 +53,7 @@ export default function TodayPlanPage() {
 
   // Active tasks (not done, today)
   const activeTasks = useMemo(() => {
-    const raw = tasks.filter((t) => t.dueDate === today && !t.done)
+    const raw = tasks.filter((t) => t.dueDate === today && !t.done && isActiveTask(t))
     const filtered = filter === 'all' ? raw : raw.filter((t) => t.priority === filter)
     return sortTasks(filtered)
   }, [tasks, today, filter])
@@ -199,6 +201,8 @@ export default function TodayPlanPage() {
           )}
         </>
       )}
+
+      <TaskRecovery />
 
       <TaskDetailModal
         task={detailTask}

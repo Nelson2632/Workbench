@@ -20,6 +20,10 @@ export interface Task {
   priority: TaskPriority
   done: boolean
   completedAt?: string | null
+  disposition?: 'active' | 'stashed' | 'abandoned'
+  stashedAt?: string | null
+  abandonedAt?: string | null
+  parentTaskId?: string
   note: string
   projectId: string
   dueDate: string

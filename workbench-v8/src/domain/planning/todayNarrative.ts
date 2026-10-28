@@ -1,7 +1,8 @@
+import { isActiveTask } from '@/domain/planning/taskLifecycle'
 import type { Task } from '@/types'
 
 export function selectTodayNarrative(tasks: Task[], date: string, selectedNowId?: string, clock = '') {
-  const eligible = tasks.filter((t) => !t.done && t.dueDate === date)
+  const eligible = tasks.filter((t) => !t.done && isActiveTask(t) && t.dueDate === date)
   const rank = { P0: 0, P1: 1, P2: 2 }
   const ready = (t: Task) => !!t.startTime && t.startTime <= clock && t.priority !== 'P2'
   const plan = [...eligible].sort((a, b) =>

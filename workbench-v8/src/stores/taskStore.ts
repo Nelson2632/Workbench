@@ -1,3 +1,4 @@
+import { isActiveTask } from '@/domain/planning/taskLifecycle'
 // ============================================================
 // Personal Workbench V8 — Task Store
 // ============================================================
@@ -166,9 +167,8 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     let events: AppEvent[] = []
     const sync = async () => {
       const fact = await db.tasks.get(taskId)
-      if (!fact) throw new Error('任务已不存在')
-      set((s) => ({ tasks: s.tasks.map((t) => t.id === taskId ? fact : t) }))
-      if (fact.completedAt) dates.push(timestampDay(fact.completedAt))
+      set((s) => ({ tasks: fact ? s.tasks.map((t) => t.id === taskId ? fact : t) : s.tasks.filter(t => t.id !== taskId) }))
+      if (fact?.completedAt) dates.push(timestampDay(fact.completedAt))
       // Replays repair projections from canonical current state, never rewrite it.
       events = [{ type: 'task.updated', taskId }]
       await projectTaskCompletion(events, dates)
@@ -243,15 +243,15 @@ export const useTaskStore = create<TaskState>((set, get) => ({
 
   getTodayTasks: () => {
     const today = formatDate(new Date())
-    return get().tasks.filter((t) => t.dueDate === today && !t.done)
+    return get().tasks.filter((t) => t.dueDate === today && !t.done && isActiveTask(t))
   },
 
   getInboxTasks: () => {
-    return get().tasks.filter((t) => !t.dueDate && !t.projectId && !t.done)
+    return get().tasks.filter((t) => !t.dueDate && !t.projectId && !t.done && isActiveTask(t))
   },
 
   getFutureTasks: () => {
     const today = formatDate(new Date())
-    return get().tasks.filter((t) => !t.done && t.dueDate && t.dueDate > today)
+    return get().tasks.filter((t) => !t.done && isActiveTask(t) && t.dueDate && t.dueDate > today)
   },
 }))

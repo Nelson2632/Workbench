@@ -1,3 +1,4 @@
+import { isActiveTask } from '@/domain/planning/taskLifecycle'
 import { timestampDay } from '@/utils/helpers'
 // ============================================================
 // V9 WORK — Night Shutdown 聚合（V9_MASTER_PLAN §9 / V9-C-002 §6.5）
@@ -46,7 +47,7 @@ export async function aggregateNightShutdown(date: string): Promise<ShutdownAggr
     .filter((t) => t.done && t.completedAt && isSameDay(t.completedAt, date))
     .map((t) => ({ id: t.id, title: t.title }))
   const unfinished = tasks
-    .filter((t) => !t.done && t.dueDate === date)
+    .filter((t) => !t.done && isActiveTask(t) && t.dueDate === date)
     .map((t) => ({ id: t.id, title: t.title }))
 
   let studyMinutes = studySessions
