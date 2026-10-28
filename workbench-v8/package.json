@@ -20,8 +20,8 @@
     "@tauri-apps/cli": "^2.11.4",
     "fake-indexeddb": "^6.2.5",
     "typescript": "~6.0.2",
-    "vite": "^8.2.0",
-    "vitest": "^4.1.11"
+    "vite": "8.2.4",
+    "vitest": "4.1.12"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.11.1",
@@ -35,5 +35,8 @@
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2",
     "zustand": "^5.0.15"
+  },
+  "overrides": {
+    "source-map-js": "1.2.2"
   }
 }

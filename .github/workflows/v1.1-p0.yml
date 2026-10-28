@@ -29,6 +29,9 @@ jobs:
           cache: npm
           cache-dependency-path: workbench-v8/package-lock.json
       - run: npm ci
+      - name: Dependency advisories
+        if: matrix.timezone == 'UTC'
+        run: npm audit --audit-level=moderate
       - run: npm run test:run
       - run: npm run build
       - name: Contracts and implementation
