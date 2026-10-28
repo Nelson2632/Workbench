@@ -1,3 +1,4 @@
+import CompletionFeedback from '@/components/plan/CompletionFeedback'
 import { useMemo } from 'react'
 import { useLocation, Outlet } from 'react-router-dom'
 import { useSystemStore } from '@/stores/systemStore'
@@ -53,6 +54,7 @@ export default function AppLayout() {
           data-visual-scope={isReviewCockpit ? 'review-data' : undefined}
         >
           <div className={`${styles.canvas} ${canvasClass}`}>
+            <CompletionFeedback />
             <Outlet />
           </div>
         </main>

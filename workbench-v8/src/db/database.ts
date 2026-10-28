@@ -455,14 +455,13 @@ export class WorkbenchDB extends Dexie {
 
       // 异常膨胀：全清比逐条裁剪更快更稳（clear 不载入 JS 内存）
       if (count > 50000) {
-        await this.systemCommandIds.clear()
-        return count
+        return this.systemCommandIds.filter((r) => !r.projectionRecovery).delete()
       }
 
       // 正常规模：内存过滤出过期主键后删除（表小，安全）
       const cutoff = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000).toISOString()
       const staleKeys = await this.systemCommandIds
-        .filter((r) => (r.processedAt ?? '') < cutoff)
+        .filter((r) => !r.projectionRecovery && (r.processedAt ?? '') < cutoff)
         .primaryKeys()
       if (staleKeys.length > 0) {
         await this.systemCommandIds.bulkDelete(staleKeys)

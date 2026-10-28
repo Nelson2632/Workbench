@@ -188,6 +188,8 @@ describe('Mutation Lane', () => {
   })
 
   it('MUST-02：afterCommit 抛错 → 命令仍 resolve success', async () => {
+    const seen: string[] = []
+    eventBus.subscribeAll((event) => seen.push(event.type))
     const res = await runCommand({
       commandType: 'diary.create',
       commandId: 'd1',
@@ -195,11 +197,13 @@ describe('Mutation Lane', () => {
       mutate: async () => {
         await db.diaries.add({ date: '2026-09-01', content: 'x' } as never)
       },
+      events: () => [{ type: 'diary.created', diaryId: 1 }],
       afterCommit: () => {
         throw new Error('ui boom')
       },
     })
     expect(res.deduped).toBe(false)
     expect(await db.diaries.count()).toBe(1)
+    expect(seen).toEqual(['diary.created'])
   })
 })

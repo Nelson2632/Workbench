@@ -6,7 +6,7 @@
 // ============================================================
 
 import { db } from '@/db/database'
-import { eventBus, type DomainEvent } from '@/domain/events/eventBus'
+import { eventBus, isCriticalOwned, type DomainEvent } from '@/domain/events/eventBus'
 import { faultInjection } from '@/utils/faultInjection'
 import type { SourceType } from '@/types'
 
@@ -28,7 +28,7 @@ const INCLUDE_SOURCE: Record<string, SourceType> = {
   'music.logged': 'music',
 }
 
-const MUTATE_EVENTS = new Set(['diary.updated', 'event.updated', 'event.completed'])
+const MUTATE_EVENTS = new Set(['task.updated', 'diary.updated', 'event.updated', 'event.completed'])
 
 const DELETE_LINKAGE: Record<string, SourceType> = {
   'task.deleted': 'task',
@@ -77,11 +77,11 @@ function fallbackTime(primary: string | null | undefined, secondary: string | nu
 
 async function deriveTaskCompleted(taskId: string): Promise<DerivedRow | null> {
   const t = await db.tasks.get(taskId)
-  if (!t) return null
+  if (!t || !t.done) return null
   return {
     eventKey: makeEventKey('task', taskId, 'task.completed'),
     sourceDomain: 'work', sourceType: 'task', sourceId: taskId, eventType: 'task.completed',
-    occurredAt: fallbackTime((t as any).completedAt, t.updatedAt),
+    occurredAt: fallbackTime(t.completedAt, t.updatedAt),
     title: t.title,
     summary: `完成任务（${t.priority}）`,
     metadata: null,
@@ -295,7 +295,14 @@ async function handleInclude(event: DomainEvent): Promise<void> {
 }
 
 async function handleMutate(event: DomainEvent): Promise<void> {
-  if (event.type === 'diary.updated') {
+  if (event.type === 'task.updated') {
+    const task = await db.tasks.get(event.taskId)
+    if (!task?.done) {
+      await handleDeleteLinkage({ type: 'task.deleted', taskId: event.taskId })
+    } else if (!(await db.timelineEvents.where('eventKey').equals(makeEventKey('task', task.id, 'task.completed')).first())) {
+      await handleInclude({ type: 'task.completed', taskId: task.id, completedAt: task.completedAt || task.updatedAt })
+    }
+  } else if (event.type === 'diary.updated') {
     const derived = await deriveDiaryCreated(event.diaryId)
     if (!derived) return
     const row = await db.timelineEvents.where('eventKey').equals(derived.eventKey).first()
@@ -438,20 +445,28 @@ export async function _flushProjectionForTests(): Promise<void> {
   }
 }
 
+// Shared serialized writer avoids duplicate eventKey races between commands and
+// background subscriptions. Failures propagate to critical callers.
+let projectionTail: Promise<unknown> = Promise.resolve()
+export function projectTimelineEvent(event: DomainEvent): Promise<void> {
+  const p = projectionTail.then(async () => {
+    await faultInjection.fire('mid_projection')
+    if (INCLUDE_SOURCE[event.type]) await handleInclude(event)
+    else if (MUTATE_EVENTS.has(event.type)) await handleMutate(event)
+    else if (DELETE_LINKAGE[event.type]) await handleDeleteLinkage(event)
+  })
+  projectionTail = p.catch(() => undefined)
+  return p
+}
+
 export function setupProjection(): void {
   if (initialized) return
   initialized = true
   eventBus.subscribeAll((event) => {
-    const p = (async () => {
-      try {
-        await faultInjection.fire('mid_projection')
-        if (INCLUDE_SOURCE[event.type]) await handleInclude(event)
-        else if (MUTATE_EVENTS.has(event.type)) await handleMutate(event)
-        else if (DELETE_LINKAGE[event.type]) await handleDeleteLinkage(event)
-      } catch (err) {
-        console.error(`[TimelineProjection] handler error for "${event.type}":`, err)
-      }
-    })()
+    if (isCriticalOwned(event)) return
+    const p = projectTimelineEvent(event).catch((err) => {
+      console.error(`[TimelineProjection] handler error for "${event.type}":`, err)
+    })
     pendingHandlers.add(p)
     void p.finally(() => pendingHandlers.delete(p))
   })

@@ -1,0 +1,67 @@
+name: Workbench v1.1 P0
+on:
+  pull_request:
+  push:
+    branches: [main, 'codex/v1.1-*']
+permissions:
+  contents: read
+concurrency:
+  group: workbench-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  unit:
+    name: unit (${{ matrix.timezone }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        timezone: [UTC, Asia/Shanghai, America/New_York]
+    env:
+      TZ: ${{ matrix.timezone }}
+    defaults:
+      run:
+        working-directory: workbench-v8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: workbench-v8/package-lock.json
+      - run: npm ci
+      - run: npm run test:run
+      - run: npm run build
+      - name: Contracts and implementation
+        working-directory: .
+        run: |
+          node scripts/contract-gate.mjs
+          node scripts/implementation-gate.mjs
+  browser:
+    name: browser motivation loop
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: workbench-v8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: workbench-v8/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e:web
+  required:
+    name: required
+    if: always()
+    needs: [unit, browser]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require all checks
+        env:
+          UNIT_RESULT: ${{ needs.unit.result }}
+          BROWSER_RESULT: ${{ needs.browser.result }}
+        run: |
+          test "$UNIT_RESULT" = success
+          test "$BROWSER_RESULT" = success

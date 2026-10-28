@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useReliableCapture } from '@/hooks/useReliableCapture'
+import { selectTodayNarrative } from '@/domain/planning/todayNarrative'
 import { useNavigate } from 'react-router-dom'
 import { useTaskStore } from '@/stores/taskStore'
 import { useRecurringStore } from '@/stores/recurringStore'
@@ -10,7 +12,7 @@ import { useNightShutdownStore } from '@/stores/nightShutdownStore'
 import { useInboxStore } from '@/stores/inboxStore'
 import { useSystemStore } from '@/stores/systemStore'
 import { eventBus } from '@/domain/events/eventBus'
-import { getGreeting, formatDate, isToday, getDaysDiff } from '@/utils/helpers'
+import { getGreeting, formatDate, isToday, getDaysDiff, uid } from '@/utils/helpers'
 import Button from '@/components/ui/Button'
 import EmptyState from '@/components/ui/EmptyState'
 import Menu from '@/components/ui/Menu'
@@ -51,7 +53,14 @@ export default function TodayPage() {
   const { toast } = useToast()
   const openSearch = useSystemStore((s) => s.openSearch)
 
-  const { tasks, loading: tasksLoading, loadTasks, toggleDone, updateTask } = useTaskStore()
+  const { tasks, loading: tasksLoading, loadTasks, setDone, updateTask } = useTaskStore()
+  const completeTask = (task: Task) => {
+    const previous = useTaskStore.getState().completions[task.id]
+    const intent = previous && previous.phase !== 'projected' ? previous : {
+      taskId: task.id, desiredDone: !task.done, commandId: 'cmd_' + uid(),
+    }
+    return setDone(intent)
+  }
   const { recurringTasks, loadRecurring, generateTodayTasks } = useRecurringStore()
   const { pomodoroLogs, countdowns, loadPomodoroLogs, loadCountdowns } = useToolStore()
   const { subjects, loadSubjects } = useStudyStore()
@@ -101,14 +110,10 @@ export default function TodayPage() {
       .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
   }, [tasks, today])
 
-  // Now：今日全部计划任务（Plane/Flow，禁止 Panel）
-  const nowTasks = todayTasks
-
-  // Next：周期计划（Flow，展示全部）
-  const recurringTodayTasks = useMemo(() => {
-    return tasks.filter((t) => t.sourceRecurringId && t.dueDate === today && !t.done)
-  }, [tasks, today])
-  const nextTasks = recurringTodayTasks
+  const [selectedNowId, setSelectedNowId] = useState<string>()
+  const narrative = useMemo(() => selectTodayNarrative(tasks, today, selectedNowId, formatClock(clock)), [tasks, today, selectedNowId, clock])
+  const nowTasks = narrative.now ? [narrative.now] : []
+  const nextTasks = narrative.next
 
   // ---- Pomodoro stats for today ----
   const pomodoroStats = useMemo(() => {
@@ -163,7 +168,8 @@ export default function TodayPage() {
   }, [tasks])
 
   // ---- Capture：Enter → Inbox ----
-  const [captureValue, setCaptureValue] = useState('')
+  const capture = useReliableCapture(addItem)
+  const { value: captureValue, setValue: setCaptureValue } = capture
   const captureRef = useRef<HTMLInputElement>(null)
 
   // 键盘进入：初始焦点落在 Capture；鼠标进入：不自动 autofocus
@@ -181,10 +187,7 @@ export default function TodayPage() {
 
   async function handleCapture() {
     const title = captureValue.trim()
-    if (!title) return
-    await addItem(title)
-    setCaptureValue('')
-    toast(`已加入收件箱：${title}`, 'success')
+    if (await capture.submit()) toast(`已加入收件箱：${title}`, 'success')
   }
 
   // 逾期任务一键顺延到今天（dueDate 改为今天，重新进入今日列表）
@@ -351,7 +354,7 @@ export default function TodayPage() {
                   <button
                     type="button"
                     className={styles.overdueActionPrimary}
-                    onClick={() => void toggleDone(task.id)}
+                    onClick={() => void completeTask(task)}
                     aria-label={`完成「${task.title}」`}
                   >
                     完成
@@ -366,6 +369,7 @@ export default function TodayPage() {
       {/* ===== Capture（Plane/Flow + Input，轻量，不强制元数据） ===== */}
       <section className={styles.capture}>
         <input
+          aria-busy={capture.pending}
           ref={captureRef}
           className={styles.captureInput}
           value={captureValue}
@@ -376,12 +380,13 @@ export default function TodayPage() {
           placeholder="记点什么，Enter 进入收件箱…"
           aria-label="快速捕获"
         />
+        {capture.error && <p role="alert">{capture.error} <button onClick={() => void handleCapture()}>重试保存</button></p>}
       </section>
 
       {/* ===== Action Space（Section）：Now / Next / Today Plan ===== */}
       <section className={`${styles.actionSpace} surface-section`} aria-label="行动空间">
         {/* Now（Plane/Flow，禁止 Panel） */}
-        <div className={styles.now}>
+        <div className={styles.now} data-testid="today-now">
           <div className={styles.flowLabel}>现在 · Now</div>
           {isLoading ? (
             <div className={styles.loading}>加载中...</div>
@@ -402,29 +407,30 @@ export default function TodayPage() {
                 <TaskRow
                   key={task.id}
                   task={task}
-                  onToggle={() => toggleDone(task.id)}
-                  onOpen={() => openDetail(task)}
+                  onToggle={() => void completeTask(task)}
+                  onOpen={() => { setSelectedNowId(task.id); openDetail(task) }}
                 />
               ))}
             </ul>
           )}
         </div>
 
+        {narrative.now && <div><Button variant="quiet" onClick={() => openDetail(narrative.now!)}>开始 · {narrative.now.title}</Button><Button variant="quiet" onClick={() => openDetail(narrative.now!)}>先做 5 分钟</Button></div>}
         {/* Next（Flow，最多 2~4 条） */}
-        <div className={styles.next}>
+        <div className={styles.next} data-testid="today-next">
           <div className={styles.flowLabel}>接下来 · Next</div>
           {isLoading ? (
             <div className={styles.loading}>加载中...</div>
           ) : nextTasks.length === 0 ? (
-            <p className={styles.emptyText}>暂无周期计划</p>
+            <p className={styles.emptyText}>接下来没有其他安排</p>
           ) : (
             <ul className={styles.taskList}>
               {nextTasks.map((task) => (
                 <TaskRow
                   key={task.id}
                   task={task}
-                  onToggle={() => toggleDone(task.id)}
-                  onOpen={() => openDetail(task)}
+                  onToggle={() => void completeTask(task)}
+                  onOpen={() => { setSelectedNowId(task.id); openDetail(task) }}
                 />
               ))}
             </ul>
@@ -433,7 +439,7 @@ export default function TodayPage() {
 
         {/* Today Plan（唯一默认 Panel） */}
         <div className={`${styles.todayPlan} surface-panel`}>
-          <h2 className={styles.panelTitle}>今日计划 · Today Plan</h2>
+          <h2 className={styles.panelTitle}>今日计划 · Today Plan</h2><Button variant="quiet" onClick={() => navigate("/plan/today")}>查看完整计划（{narrative.plan.length} 项）</Button>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginBottom: 8 }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               可用分钟
@@ -631,11 +637,14 @@ export default function TodayPage() {
 // ---- Task Row ----
 
 function TaskRow({ task, onToggle, onOpen }: { task: Task; onToggle: () => void; onOpen: () => void }) {
+  const state = useTaskStore((s) => s.completions[task.id])
+  const pending = state?.phase === 'persisting' || state?.phase === 'committed'
   return (
     <li className={`${styles.taskItem} theme-interactive`} data-v9-done={task.done ? 'true' : 'false'}>
       <button
         className={`${styles.checkbox} ${task.done ? styles.checked : ''}`}
         onClick={onToggle}
+        disabled={pending}
         aria-label={task.done ? '标记为未完成' : '标记为已完成'}
         data-v9-done-glow={task.done ? 'true' : 'false'}
         style={{ position: 'relative' }}
