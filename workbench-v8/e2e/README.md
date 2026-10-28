@@ -1,33 +1,21 @@
-# V9 Playwright E2E
+# Browser 与桌面回归
 
-覆盖 V9_MASTER_PLAN 的四条核心闭环主链路 + 全局搜索 + 主题切换 + 降级触发。
-
-## 前置安装（本会话未完成，原因见下）
+统一使用 npm，在 `workbench-v8` 执行：
 
 ```bash
-cd workbench-v8
-pnpm add -D @playwright/test
+npm ci
 npx playwright install chromium
+npm run test:e2e:web
 ```
 
-## 运行
+`test:e2e:web` 启动 Vite，覆盖 v1.1 的 Now/Next、双击、保存失败、投影恢复与 Reduced Motion。故障注入仅由测试通过 Vite 的源码模块装配，没有生产 debug API。
+
+完整桌面回归另执行：
 
 ```bash
-pnpm exec playwright test            # 自动拉起 tauri dev（桌面窗口）
-pnpm exec playwright test --headed   # 可见模式
+npx playwright test --config playwright.config.ts
 ```
 
-## 本会话受阻说明
+桌面配置使用 `npm run tauri:dev`，需要 Rust、平台 Tauri 系统依赖及可用图形环境。浏览器测试成功不等同于 macOS WebView、原生通知、浮窗、文件备份、安装包或 VoiceOver 已验收。
 
-安装 `@playwright/test` 与 `@types/node` 时被 pnpm 存储冲突阻断：
-
-> "If you want to use the new store location, reinstall your dependencies with pnpm install."
-
-当前 node_modules 由另一 pnpm 版本/存储位置安装。**建议在干净环境执行**：
-
-```bash
-pnpm config set store-dir <统一路径> --global
-# 或删除 node_modules 与 pnpm-lock.yaml 后重新 pnpm install
-```
-
-spec 与配置已就绪；环境恢复后上述两条命令即可运行 E2E。
+如果工作区残留另一包管理器生成的 node_modules，请在独立干净 checkout 执行 npm ci；不修改全局包管理器配置。不要重新生成 pnpm-lock.yaml。

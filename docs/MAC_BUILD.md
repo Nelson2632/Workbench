@@ -22,7 +22,7 @@
 
 ```bash
 cd workbench-v8
-npm install
+npm ci
 
 # 打包 .app + .dmg（--bundles 覆盖仓库默认的 nsis targets，Windows 配置不受影响）
 npx tauri build --bundles app,dmg

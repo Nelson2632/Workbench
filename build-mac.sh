@@ -31,8 +31,8 @@ echo "==> bundles: $BUNDLES"
 cd "$APP_DIR"
 
 if [ ! -d node_modules ]; then
-  echo "==> npm install"
-  npm install --no-audit --no-fund
+  echo "==> npm ci"
+  npm ci --no-audit --no-fund
 fi
 
 echo "==> tauri build --bundles $BUNDLES"

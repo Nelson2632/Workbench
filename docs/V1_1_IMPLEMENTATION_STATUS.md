@@ -1,6 +1,8 @@
 # Workbench v1.1 实施记录
 
-状态：首批 P0 实现已提交，尚未达到发布门槛。禁止据本文标记 v1.1/v10.1 Release Ready。
+状态：首批 P0 实现与工具链安全补丁已提交，尚未达到发布门槛。禁止据本文标记 v1.1/v10.1 Release Ready。
+补充核验：P0 代码 `1d83994` 的 [Actions run 40722066304](https://github.com/Nelson2632/Workbench/actions/runs/40722066304) 三时区、构建、两门禁和浏览器 5/5 均通过。下文浏览器失败记录属于本地环境；工具链修复与后续验收见 [安全补丁记录](./V1_1_SECURITY_TOOLCHAIN.md)。
+
 日期：2026-10-28（Asia/Shanghai）。基线：`97376e706f7f455bb290a25c07ababb397a862f0`。
 
 ## 依据与核实结果
@@ -17,13 +19,13 @@
 
 | 优先级/阶段 | 内容 | 本次状态 |
 |---|---|---|
-| P0-A | 稳定完成意图、显式 desiredDone、关键投影屏障、错误分层 | 已实现，单元通过，浏览器未验证 |
-| P0-B | 独立 transient feedback、按意图去重、Reduced Motion | 已实现，运行时用例因浏览器缺失未运行 |
-| P0-C | Now≤1/Next≤4、完整计划入口、Capture 失败保留输入 | 已实现，选择器单元通过，浏览器未验证 |
+| P0-A | 稳定完成意图、显式 desiredDone、关键投影屏障、错误分层 | 已实现，单元及远端浏览器通过 |
+| P0-B | 独立 transient feedback、按意图去重、Reduced Motion | 已实现，远端运行时场景 5/5 通过 |
+| P0-C | Now≤1/Next≤4、完整计划入口、Capture 失败保留输入 | 已实现，选择器单元及远端浏览器通过 |
 | P0-D | 任务完成/撤销实时更新 Timeline 与 Daily Memory；本地日期 | 已实现，单元通过 |
 | P1-A | 非破坏式 Recover 生命周期、拆分、批量 preview/Undo、迁移 | 待实施，单独 PR，不能用 delete 代替 |
 | P1-B | Memory 回源与全面事件覆盖、可选反思、提醒策略、Toast | 待实施 |
-| P1-C | npm 单一管理器、仓库质量门、a11y/运行时回归 | 本 PR 新增 CI 与 test:run/web 脚本；双锁清理与桌面 e2e 仍待实施 |
+| P1-C | npm 单一管理器、仓库质量门、a11y/运行时回归 | 已新增 CI、test:run/web 与 npm 单一管理；远端 browser 通过，桌面 e2e 仍未验证 |
 | P1-D | CSP 与真实 macOS bundle/启动/备份升级验证 | 待 macOS 环境验证；此环境不能证明通过 |
 | P2 | 索引/批量投影性能、本地指标、声音、仓库归档 | 延后；不接外部 analytics |
 
@@ -61,11 +63,11 @@
 
 新增测试验证：并发同意图、DB 写入失败重试、投影失败恢复、投影延迟不早反馈、事务后结果不明、取消完成、冷重放不庆祝、重启恢复待投影入口且不被缓存清理、Now/Next/完整计划、当地午夜归日。新增 5 个浏览器用例覆盖实际 UI，但不能把编写完成计为验证通过。
 
-CI 新增 UTC/Shanghai/New_York 单元矩阵、构建、现有两门禁、浏览器 motivation suite 和聚合 required job，Actions SHA 从官方仓库 ref 查询。尚未证明远端 Actions 已通过；GitHub ruleset 需配置 required check 才能强制阻止合并，本 PR 不擅自更改管理员规则。
+CI 新增 UTC/Shanghai/New_York 单元矩阵、构建、现有两门禁、浏览器 motivation suite 和聚合 required job，Actions SHA 从官方仓库 ref 查询。已核对 P0 远端 Actions success（包括 5 个浏览器场景）；GitHub ruleset 需配置 required check 才能强制阻止合并，本 PR 不擅自更改管理员规则。
 
 ## 合并与发布阻断项
 
-1. 浏览器 motivation suite 必须在可安装 Chromium 的环境实际通过，检查布局、按钮、焦点与动效；当前 PR 保持 Draft。
+1. P0 browser suite 已在远端通过，仍需人工三主题/焦点/读屏和真实桌面验证；当前 PR 保持 Draft。
 2. P1 Recover 等尚未实施；没有把任务生命周期、提醒、CSP 随 P0 一起改掉。
 3. 待投影恢复元数据与主事实同事务写入 systemCommandIds（可选非索引字段），清理幂等缓存时保留未完成恢复。重启 loadTasks 后恢复同步重试入口，修复历史派生数据不播放旧庆祝；此路径已有单元测试，桌面重启仍需实测。
 4. 跨窗口串行性不由模块内 FIFO 自动保证，需桌面多窗口验证。冷重放仅恢复派生数据，不重发历史庆祝。

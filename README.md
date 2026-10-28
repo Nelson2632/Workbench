@@ -36,11 +36,15 @@
 - [四闭环优化计划](docs/USER_MOTIVATION_LOOPS_PLAN.md)：Start / Complete / Recover / Memory 的产品目标、工程约束、路线图和测试矩阵。
 - [四主题动画实验室](docs/experiments/motion-lab.html)：可直接在浏览器打开的独立交互原型，仅用于体验和视觉验证，不连接真实数据层。
 
+## 依赖管理
+
+统一使用 npm 与 package-lock.json。干净安装使用 npm ci；请勿生成第二份 JavaScript lockfile。
+
 ## 构建（macOS）
 
 ```bash
 cd workbench-v8
-npm install
+npm ci
 npx tauri build --bundles app,dmg
 # 产物：src-tauri/target/release/bundle/macos/个人工作台.app
 #       src-tauri/target/release/bundle/dmg/个人工作台_0.8.1_aarch64.dmg
