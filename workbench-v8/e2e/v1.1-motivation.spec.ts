@@ -88,7 +88,7 @@ test('recovery preview, batch stash and undo preserve tasks', async ({ page }) =
   await recovery.getByRole('button', { name: '预览暂存' }).click()
   await expect(recovery.getByRole('region', { name: '调整预览' })).toContainText('暂存 · 2 项')
   await recovery.getByRole('button', { name: '确认调整' }).click()
-  await expect(recovery.getByRole('status')).toContainText('已调整 2 项')
+  await expect(recovery.getByRole('status').filter({ hasText: '已调整 2 项' })).toBeVisible()
   await expect(page.getByRole('button', { name: '标记为已完成', exact: true })).toHaveCount(0)
   await page.reload()
   await recovery.getByRole('button', { name: '撤销上次调整' }).click()
