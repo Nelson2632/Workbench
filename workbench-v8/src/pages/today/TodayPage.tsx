@@ -1,3 +1,4 @@
+import { noteLocalMetric } from '@/domain/system/localMetrics'
 import { isActiveTask } from '@/domain/planning/taskLifecycle'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useReliableCapture } from '@/hooks/useReliableCapture'
@@ -417,7 +418,7 @@ export default function TodayPage() {
           )}
         </div>
 
-        {narrative.now && <div><Button variant="quiet" onClick={() => openDetail(narrative.now!)}>开始 · {narrative.now.title}</Button><Button variant="quiet" onClick={() => openDetail(narrative.now!)}>先做 5 分钟</Button></div>}
+        {narrative.now && <div><Button variant="quiet" onClick={() => { noteLocalMetric('startSelected'); openDetail(narrative.now!) }}>开始 · {narrative.now.title}</Button><Button variant="quiet" onClick={() => { noteLocalMetric('startSelected'); openDetail(narrative.now!) }}>先做 5 分钟</Button></div>}
         {/* Next（Flow，最多 2~4 条） */}
         <div className={styles.next} data-testid="today-next">
           <div className={styles.flowLabel}>接下来 · Next</div>

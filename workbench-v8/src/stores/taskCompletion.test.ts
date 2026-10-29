@@ -101,3 +101,15 @@ describe('Completion intent truth and recovery', () => {
     expect(store.getState().feedback).toHaveLength(0)
   })
 })
+
+it('quick-add retry after an uncertain commit cannot create a duplicate task', async () => {
+  const commandId = 'capture-one'
+  faultInjection.enable(); faultInjection.inject('after_domain_commit', () => { throw new Error('crash') })
+  await expect(store.getState().addTask({ title: '保留文字' }, commandId)).rejects.toThrow('crash')
+  faultInjection.clear()
+  await store.getState().addTask({ title: '保留文字' }, commandId)
+  expect(await db.tasks.filter(t => t.title === '保留文字').count()).toBe(1)
+  await db.systemCommandIds.clear()
+  await store.getState().addTask({ title: '保留文字' }, commandId)
+  expect(await db.tasks.filter(t => t.title === '保留文字').count()).toBe(1)
+})

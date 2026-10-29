@@ -24,7 +24,7 @@ interface NightShutdownState {
   loading: boolean
 
   loadByDate: (date: string) => Promise<void>
-  complete: (input: ShutdownInput) => Promise<number>
+  complete: (input: ShutdownInput, commandId?: string) => Promise<number>
   remove: (id: number) => Promise<void>
 }
 
@@ -47,7 +47,7 @@ export const useNightShutdownStore = create<NightShutdownState>((set) => ({
     }
   },
 
-  complete: async (input) => {
+  complete: async (input, commandId = 'cmd_' + uid()) => {
     const agg = await aggregateNightShutdown(input.date)
     const now = new Date().toISOString()
     const completed = agg.completed
@@ -55,7 +55,7 @@ export const useNightShutdownStore = create<NightShutdownState>((set) => ({
 
     const { result } = await runCommand<NightShutdown>({
       commandType: 'nightShutdown.complete',
-      commandId: 'cmd_' + uid(),
+      commandId,
       tables: ['nightShutdown'],
       mutate: async () => {
         // 一天一次收口：同日已存在 → 更新（upsert，避免唯一索引冲突）
@@ -91,7 +91,10 @@ export const useNightShutdownStore = create<NightShutdownState>((set) => ({
         set({ current: row })
       },
     })
-    return result!.id
+    const canonical = result ?? await db.nightShutdown.where('date').equals(input.date).first()
+    if (!canonical) throw new Error('收口保存结果不可用')
+    set({ current: canonical })
+    return canonical.id
   },
 
   remove: async (id) => {

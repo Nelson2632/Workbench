@@ -1,3 +1,4 @@
+import { noteLocalMetric } from '@/domain/system/localMetrics'
 import { useRef, useState } from 'react'
 import { uid } from '@/utils/helpers'
 
@@ -19,11 +20,12 @@ export function useReliableCapture(save: (text: string, commandId: string) => Pr
     setError('')
     try {
       await save(text, intent.current.id)
+      noteLocalMetric('captureSaved')
       if (draft.current.trim() === text) edit('')
       intent.current = null
       return true
     } catch {
-      setError('未能保存，文字已保留。请重试。')
+      setError('保存结果未确认，文字已保留。请重试。')
       return false
     } finally {
       busy.current = false

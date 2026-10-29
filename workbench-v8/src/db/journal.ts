@@ -20,6 +20,11 @@ export async function journalEvent(
   })
 }
 
+const pendingWrites = new Set<Promise<unknown>>()
+export async function flushJournal(): Promise<void> {
+  while (pendingWrites.size) await Promise.allSettled([...pendingWrites])
+}
+
 /**
  * Journal 汇流：订阅全部 EventBus 事件并落库（V9-C-002 §2 发布纪律）。
  * 已由 Mutation Lane 原子落 journal 的事件（markJournaled）跳过，避免重复写。
@@ -30,8 +35,10 @@ export function setupJournalSink(): () => void {
     if (isJournaled(event)) return
     const rest: Record<string, unknown> = { ...(event as object) }
     delete rest.type
-    void journalEvent(event.type, Object.keys(rest).length > 0 ? rest : null).catch((err) => {
+    const writing = journalEvent(event.type, Object.keys(rest).length > 0 ? rest : null).catch((err) => {
       console.error('[Journal] write failed:', err)
     })
+    pendingWrites.add(writing)
+    void writing.finally(() => pendingWrites.delete(writing))
   })
 }

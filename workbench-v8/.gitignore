@@ -33,3 +33,7 @@ src-tauri/gen
 # Browser test output
 /test-results/
 /playwright-report/
+
+/coverage/
+/native-smoke.log
+/native-smoke.png

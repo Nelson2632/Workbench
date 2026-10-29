@@ -51,11 +51,11 @@ export function verifyAndParseBackup(json: string): Record<string, any[]> {
   if (!payload || payload.version !== BACKUP_VERSION) {
     throw new Error(`备份版本不兼容（当前支持 v${BACKUP_VERSION}）`)
   }
-  if (!payload.data || typeof payload.data !== 'object') {
+  if (!payload.data || typeof payload.data !== 'object' || Array.isArray(payload.data)) {
     throw new Error('备份内容缺失')
   }
   const checksum = computeChecksum(JSON.stringify(payload.data))
-  if (payload.checksum && checksum !== payload.checksum) {
+  if (!payload.checksum || checksum !== payload.checksum) {
     throw new Error('备份完整性校验失败（checksum 不匹配）')
   }
   return payload.data

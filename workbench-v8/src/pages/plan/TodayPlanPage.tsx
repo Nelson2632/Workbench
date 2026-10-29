@@ -1,3 +1,4 @@
+import { useReliableCapture } from '@/hooks/useReliableCapture'
 import { useSearchParams } from 'react-router-dom'
 import TaskRecovery from '@/components/plan/TaskRecovery'
 import { isActiveTask } from '@/domain/planning/taskLifecycle'
@@ -40,7 +41,8 @@ function sortTasks(tasks: Task[]): Task[] {
 export default function TodayPlanPage() {
   const { tasks, loading, loadTasks, addTask, updateTask, deleteTask, toggleDone, togglePin } = useTaskStore()
 
-  const [inputValue, setInputValue] = useState('')
+  const capture = useReliableCapture((title, commandId) => addTask({ title, dueDate: formatDate(new Date()) }, commandId))
+  const { value: inputValue, setValue: setInputValue } = capture
   const [params] = useSearchParams()
   const taskId = params.get('task')
   const [sourceMissing, setSourceMissing] = useState(false)
@@ -78,12 +80,7 @@ export default function TodayPlanPage() {
 
   const hasAnyTasks = tasks.some((t) => t.dueDate === today)
 
-  const handleQuickAdd = () => {
-    const title = inputValue.trim()
-    if (!title) return
-    addTask({ title, dueDate: today })
-    setInputValue('')
-  }
+  const handleQuickAdd = () => { void capture.submit() }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -135,11 +132,12 @@ export default function TodayPlanPage() {
           placeholder="添加今日任务，按 Enter 添加..."
           aria-label="新增任务"
         />
-        <Button variant="primary" size="sm" onClick={handleQuickAdd} disabled={!inputValue.trim()}>
-          添加
+        <Button variant="primary" size="sm" onClick={handleQuickAdd} disabled={capture.pending || !inputValue.trim()}>
+          {capture.pending ? '保存中…' : capture.error ? '重试保存' : '添加'}
         </Button>
       </div>
 
+      {capture.error && <p role="alert">{capture.error}</p>}
       <div className={styles.filters}>
         {FILTER_TABS.map((tab) => (
           <button

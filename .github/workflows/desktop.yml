@@ -23,6 +23,7 @@ jobs:
           cache: npm
           cache-dependency-path: workbench-v8/package-lock.json
       - run: npm ci
+      - run: npm run build
       - name: Toolchain and native tests
         run: |
           rustc --version
@@ -56,3 +57,15 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: cargo test --manifest-path src-tauri/Cargo.toml --locked
+  desktop-required:
+    if: always()
+    needs: [macos, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require native checks
+        env:
+          MACOS: ${{ needs.macos.result }}
+          WINDOWS: ${{ needs.windows.result }}
+        run: |
+          test "$MACOS" = success
+          test "$WINDOWS" = success

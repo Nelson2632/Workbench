@@ -182,6 +182,7 @@ export interface Mistake {
   tags: string[]
   linkedKnowledge: string[]
   mastered: boolean
+  masteredAt?: string | null
   reviewCount: number
   source: string
   createdAt: string

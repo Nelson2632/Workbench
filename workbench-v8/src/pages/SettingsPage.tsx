@@ -1,3 +1,4 @@
+import LocalMetricsSettings from '@/components/plan/LocalMetricsSettings'
 import { useState, useCallback, useRef, useEffect } from 'react'
 import PageHeader from '@/components/layout/PageHeader'
 import Button from '@/components/ui/Button'
@@ -83,14 +84,13 @@ export default function SettingsPage() {
   const [notif, setNotif] = useState<NotificationSettings>(() => loadNotificationSettings())
 
   const updateNotif = useCallback((updates: Partial<NotificationSettings>) => {
-    setNotif((prev) => {
-      const next = { ...prev, ...updates }
-      try {
-        localStorage.setItem(NOTIFICATION_SETTINGS_KEY, JSON.stringify(next))
-      } catch { /* ignore quota errors */ }
-      return next
-    })
-  }, [])
+    const next = { ...notif, ...updates }
+    setNotif(next)
+    try {
+      localStorage.setItem(NOTIFICATION_SETTINGS_KEY, JSON.stringify(next))
+      window.dispatchEvent(new Event('wb-notification-settings-changed'))
+    } catch { /* Settings remain usable if storage is unavailable. */ }
+  }, [notif])
 
   // ---- Load backup info ----
   useEffect(() => {
@@ -282,6 +282,8 @@ export default function SettingsPage() {
   return (
     <div className={styles.page} onKeyDown={handleKeyDownCapture}>
       <PageHeader title="设置" description="应用配置与个性化设置" />
+
+      <LocalMetricsSettings />
 
       {/* Theme */}
       <div className={styles.section}>

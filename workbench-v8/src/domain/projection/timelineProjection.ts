@@ -8,7 +8,7 @@
 import { db } from '@/db/database'
 import { eventBus, isCriticalOwned, type DomainEvent } from '@/domain/events/eventBus'
 import { faultInjection } from '@/utils/faultInjection'
-import type { SourceType } from '@/types'
+import type { SourceType, Task, StudySession, Mistake, ReviewEntry, Exam, NightShutdown, Diary, LifeMoment, CalendarEvent, Anime, GameRecord, Game, MusicMemory } from '@/types'
 
 // ---------- 映射表（V9-C-002 §3） ----------
 
@@ -75,8 +75,8 @@ function fallbackTime(primary: string | null | undefined, secondary: string | nu
   return new Date().toISOString()
 }
 
-async function deriveTaskCompleted(taskId: string): Promise<DerivedRow | null> {
-  const t = await db.tasks.get(taskId)
+async function deriveTaskCompleted(taskId: string, cached?: Task): Promise<DerivedRow | null> {
+  const t = cached ?? await db.tasks.get(taskId)
   if (!t || !t.done) return null
   return {
     eventKey: makeEventKey('task', taskId, 'task.completed'),
@@ -88,8 +88,8 @@ async function deriveTaskCompleted(taskId: string): Promise<DerivedRow | null> {
   }
 }
 
-async function deriveStudySession(sessionId: string): Promise<DerivedRow | null> {
-  const s = await db.studySessions.get(sessionId)
+async function deriveStudySession(sessionId: string, cached?: StudySession): Promise<DerivedRow | null> {
+  const s = cached ?? await db.studySessions.get(sessionId)
   if (!s) return null
   return {
     eventKey: makeEventKey('studySession', sessionId, 'studySession.completed'),
@@ -101,8 +101,8 @@ async function deriveStudySession(sessionId: string): Promise<DerivedRow | null>
   }
 }
 
-async function deriveMistakeResolved(mistakeId: string): Promise<DerivedRow | null> {
-  const m = await db.mistakes.get(mistakeId)
+async function deriveMistakeResolved(mistakeId: string, cached?: Mistake): Promise<DerivedRow | null> {
+  const m = cached ?? await db.mistakes.get(mistakeId)
   if (!m) return null
   return {
     eventKey: makeEventKey('mistake', mistakeId, 'mistake.resolved'),
@@ -114,8 +114,8 @@ async function deriveMistakeResolved(mistakeId: string): Promise<DerivedRow | nu
   }
 }
 
-async function deriveReviewCompleted(reviewId: string): Promise<DerivedRow | null> {
-  const r = await db.reviewEntries.get(reviewId)
+async function deriveReviewCompleted(reviewId: string, cached?: ReviewEntry): Promise<DerivedRow | null> {
+  const r = cached ?? await db.reviewEntries.get(reviewId)
   if (!r) return null
   return {
     eventKey: makeEventKey('review', reviewId, 'review.completed'),
@@ -128,8 +128,8 @@ async function deriveReviewCompleted(reviewId: string): Promise<DerivedRow | nul
   }
 }
 
-async function deriveExamCreated(examId: string): Promise<DerivedRow | null> {
-  const e = await db.exams.get(examId)
+async function deriveExamCreated(examId: string, cached?: Exam): Promise<DerivedRow | null> {
+  const e = cached ?? await db.exams.get(examId)
   if (!e) return null
   return {
     eventKey: makeEventKey('exam', examId, 'exam.created'),
@@ -142,8 +142,8 @@ async function deriveExamCreated(examId: string): Promise<DerivedRow | null> {
   }
 }
 
-async function deriveNightShutdown(date: string): Promise<DerivedRow | null> {
-  const row = await db.nightShutdown.where('date').equals(date).first()
+async function deriveNightShutdown(date: string, cached?: NightShutdown): Promise<DerivedRow | null> {
+  const row = cached ?? await db.nightShutdown.where('date').equals(date).first()
   if (!row) return null
   return {
     eventKey: makeEventKey('nightShutdown', String(row.id), 'nightShutdown.completed'),
@@ -155,8 +155,8 @@ async function deriveNightShutdown(date: string): Promise<DerivedRow | null> {
   }
 }
 
-async function deriveDiaryCreated(diaryId: number): Promise<DerivedRow | null> {
-  const d = await db.diaries.get(diaryId)
+async function deriveDiaryCreated(diaryId: number, cached?: Diary): Promise<DerivedRow | null> {
+  const d = cached ?? await db.diaries.get(diaryId)
   if (!d) return null
   return {
     eventKey: makeEventKey('diary', String(diaryId), 'diary.created'),
@@ -168,8 +168,8 @@ async function deriveDiaryCreated(diaryId: number): Promise<DerivedRow | null> {
   }
 }
 
-async function deriveLifeMoment(id: number): Promise<DerivedRow | null> {
-  const m = await db.lifeMoments.get(id)
+async function deriveLifeMoment(id: number, cached?: LifeMoment): Promise<DerivedRow | null> {
+  const m = cached ?? await db.lifeMoments.get(id)
   if (!m) return null
   return {
     eventKey: makeEventKey('lifeMoment', String(id), 'lifeMoment.created'),
@@ -181,8 +181,8 @@ async function deriveLifeMoment(id: number): Promise<DerivedRow | null> {
   }
 }
 
-async function deriveEventCreated(eventId: number): Promise<DerivedRow | null> {
-  const e = await db.events.get(eventId)
+async function deriveEventCreated(eventId: number, cached?: CalendarEvent): Promise<DerivedRow | null> {
+  const e = cached ?? await db.events.get(eventId)
   if (!e) return null
   return {
     eventKey: makeEventKey('event', String(eventId), 'event.created'),
@@ -194,8 +194,8 @@ async function deriveEventCreated(eventId: number): Promise<DerivedRow | null> {
   }
 }
 
-async function deriveAnimeEpisode(animeId: number, episode: number): Promise<DerivedRow | null> {
-  const a = await db.anime.get(animeId)
+async function deriveAnimeEpisode(animeId: number, episode: number, cached?: Anime): Promise<DerivedRow | null> {
+  const a = cached ?? await db.anime.get(animeId)
   if (!a) return null
   const entry = a.episodeLog?.find((e) => e.episode === episode)
   return {
@@ -208,8 +208,8 @@ async function deriveAnimeEpisode(animeId: number, episode: number): Promise<Der
   }
 }
 
-async function deriveAnimeCompleted(animeId: number): Promise<DerivedRow | null> {
-  const a = await db.anime.get(animeId)
+async function deriveAnimeCompleted(animeId: number, cached?: Anime): Promise<DerivedRow | null> {
+  const a = cached ?? await db.anime.get(animeId)
   if (!a) return null
   return {
     eventKey: makeEventKey('anime', String(animeId), 'anime.completed'),
@@ -221,9 +221,9 @@ async function deriveAnimeCompleted(animeId: number): Promise<DerivedRow | null>
   }
 }
 
-async function deriveGameRecord(recordId: number, gameId: number): Promise<DerivedRow | null> {
-  const rec = await db.gameRecords.get(recordId)
-  const game = await db.games.get(gameId)
+async function deriveGameRecord(recordId: number, gameId: number, cached?: GameRecord, cachedGame?: Game | null): Promise<DerivedRow | null> {
+  const rec = cached ?? await db.gameRecords.get(recordId)
+  const game = cachedGame === undefined ? await db.games.get(gameId) : cachedGame
   if (!rec) return null
   const gname = game?.name ?? `游戏#${gameId}`
   const titleMap: Record<string, string> = {
@@ -244,8 +244,8 @@ async function deriveGameRecord(recordId: number, gameId: number): Promise<Deriv
   }
 }
 
-async function deriveMusicLogged(musicId: number): Promise<DerivedRow | null> {
-  const m = await db.music.get(musicId)
+async function deriveMusicLogged(musicId: number, cached?: MusicMemory): Promise<DerivedRow | null> {
+  const m = cached ?? await db.music.get(musicId)
   if (!m) return null
   return {
     eventKey: makeEventKey('music', String(musicId), 'music.logged'),
@@ -344,63 +344,64 @@ async function handleDeleteLinkage(event: DomainEvent): Promise<void> {
 /** 全量事实派生（只读，跨表读取事实源）；供 rebuild 与 Store 手动重建复用 */
 export async function deriveAllRows(): Promise<DerivedRow[]> {
   const derived: DerivedRow[] = []
+  const games = new Map((await db.games.toArray()).map(game => [game.id, game]))
 
   const tasks = await db.tasks.toArray()
   for (const t of tasks) {
     if (!t.done) continue
-    const d = await deriveTaskCompleted(t.id)
+    const d = await deriveTaskCompleted(t.id, t)
     if (d) derived.push(d)
   }
   for (const s of await db.studySessions.toArray()) {
-    const d = await deriveStudySession(s.id)
+    const d = await deriveStudySession(s.id, s)
     if (d) derived.push(d)
   }
   const mistakes = await db.mistakes.toArray()
   for (const m of mistakes) {
     if (!m.mastered) continue
-    const d = await deriveMistakeResolved(m.id)
+    const d = await deriveMistakeResolved(m.id, m)
     if (d) derived.push(d)
   }
   for (const r of await db.reviewEntries.toArray()) {
-    const d = await deriveReviewCompleted(r.id)
+    const d = await deriveReviewCompleted(r.id, r)
     if (d) derived.push(d)
   }
   for (const e of await db.exams.toArray()) {
-    const d = await deriveExamCreated(e.id)
+    const d = await deriveExamCreated(e.id, e)
     if (d) derived.push(d)
   }
   for (const n of await db.nightShutdown.toArray()) {
-    const d = await deriveNightShutdown(n.date)
+    const d = await deriveNightShutdown(n.date, n)
     if (d) derived.push(d)
   }
   for (const d0 of await db.diaries.toArray()) {
-    const d = await deriveDiaryCreated(d0.id)
+    const d = await deriveDiaryCreated(d0.id, d0)
     if (d) derived.push(d)
   }
   for (const lm of await db.lifeMoments.toArray()) {
-    const d = await deriveLifeMoment(lm.id)
+    const d = await deriveLifeMoment(lm.id, lm)
     if (d) derived.push(d)
   }
   for (const e of await db.events.toArray()) {
-    const d = await deriveEventCreated(e.id)
+    const d = await deriveEventCreated(e.id, e)
     if (d) derived.push(d)
   }
   for (const a of await db.anime.toArray()) {
     for (const entry of a.episodeLog ?? []) {
-      const d = await deriveAnimeEpisode(a.id, entry.episode)
+      const d = await deriveAnimeEpisode(a.id, entry.episode, a)
       if (d) derived.push(d)
     }
     if (a.completedAt) {
-      const d = await deriveAnimeCompleted(a.id)
+      const d = await deriveAnimeCompleted(a.id, a)
       if (d) derived.push(d)
     }
   }
   for (const rec of await db.gameRecords.toArray()) {
-    const d = await deriveGameRecord(rec.id, rec.gameId)
+    const d = await deriveGameRecord(rec.id, rec.gameId, rec, games.get(rec.gameId) ?? null)
     if (d) derived.push(d)
   }
   for (const m of await db.music.toArray()) {
-    const d = await deriveMusicLogged(m.id)
+    const d = await deriveMusicLogged(m.id, m)
     if (d) derived.push(d)
   }
 
@@ -415,9 +416,11 @@ export async function writeProjectionRows(derived: DerivedRow[]): Promise<number
   return derived.length
 }
 
+export const PROJECTION_FACT_TABLES = ['tasks', 'studySessions', 'mistakes', 'reviewEntries', 'exams', 'nightShutdown', 'diaries', 'lifeMoments', 'events', 'anime', 'games', 'gameRecords', 'music']
 export async function rebuildProjection(): Promise<number> {
-  const derived = await deriveAllRows()
-  const count = await writeProjectionRows(derived)
+  const pending = projectionTail.then(() => db.transaction('rw', [...PROJECTION_FACT_TABLES.map(name => db.table(name)), db.timelineEvents], async () => writeProjectionRows(await deriveAllRows())))
+  projectionTail = pending.catch(() => undefined)
+  const count = await pending
   eventBus.publish({ type: 'timeline.rebuilt' })
   return count
 }

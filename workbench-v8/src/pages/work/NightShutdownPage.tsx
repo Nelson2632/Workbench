@@ -8,7 +8,7 @@ import { useCallback, useEffect, useState, useRef } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useNightShutdownStore } from '@/stores/nightShutdownStore'
-import { formatDate } from '@/utils/helpers'
+import { formatDate, uid } from '@/utils/helpers'
 import styles from '@/pages/life/life.module.css'
 
 export default function NightShutdownPage() {
@@ -26,6 +26,7 @@ export default function NightShutdownPage() {
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
   const pending = useRef(false)
+  const intent = useRef<{ key: string; id: string } | null>(null)
 
   useEffect(() => {
     void loadByDate(today)
@@ -38,6 +39,8 @@ export default function NightShutdownPage() {
       pending.current = true
       setSaving(true)
       setError('')
+      const key = JSON.stringify([today, reason, reflection, tomorrowFocus])
+      if (intent.current?.key !== key) intent.current = { key, id: 'cmd_' + uid() }
       try { await complete({
         date: today,
         reason: reason.trim(),
@@ -46,7 +49,7 @@ export default function NightShutdownPage() {
           .split(/[,，\n]+/)
           .map((s) => s.trim())
           .filter(Boolean),
-      }) } catch { setError('保存失败，文字已保留，请重试') }
+      }, intent.current.id) } catch { setError('保存失败，文字已保留，请重试') }
       finally { pending.current = false; setSaving(false) }
     },
     [complete, reason, reflection, today, tomorrowFocus],

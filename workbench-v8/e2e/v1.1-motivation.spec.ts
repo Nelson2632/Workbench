@@ -135,3 +135,13 @@ test('warning toast is a persistent alert and supports keyboard dismissal', asyn
   await page.keyboard.press('Enter')
   await expect(alert).toHaveCount(0)
 })
+
+test('opt-in night reminder has a working Shutdown CTA and can be dismissed', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('wb-notification-settings', JSON.stringify({ reviewReminderEnabled: true, reviewReminderTime: '00:00' })))
+  await page.goto('/today')
+  const reminder = page.getByRole('complementary', { name: '可选收尾提醒' })
+  await reminder.getByRole('link', { name: '进入今日收口' }).click()
+  await expect(page).toHaveURL(/today\/night-shutdown/)
+  await reminder.getByRole('button', { name: '今天先不提醒' }).click()
+  await expect(reminder).toHaveCount(0)
+})

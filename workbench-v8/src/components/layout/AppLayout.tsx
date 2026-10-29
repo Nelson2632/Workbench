@@ -1,3 +1,4 @@
+import ShutdownReminder from '@/components/plan/ShutdownReminder'
 import CompletionFeedback from '@/components/plan/CompletionFeedback'
 import { useMemo } from 'react'
 import { useLocation, Outlet } from 'react-router-dom'
@@ -55,6 +56,7 @@ export default function AppLayout() {
         >
           <div className={`${styles.canvas} ${canvasClass}`}>
             <CompletionFeedback />
+            <ShutdownReminder />
             <Outlet />
           </div>
         </main>
