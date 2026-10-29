@@ -509,7 +509,7 @@ export default function SettingsPage() {
             </div>
             <div className={styles.aboutRow}>
               <span className={styles.aboutLabel}>版本</span>
-              <span className={styles.aboutValue}>V8.0</span>
+              <span className={styles.aboutValue}>1.1.0-rc.1</span>
             </div>
             <div className={styles.aboutRow}>
               <span className={styles.aboutLabel}>技术栈</span>

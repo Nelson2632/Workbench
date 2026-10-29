@@ -1,0 +1,58 @@
+name: Desktop release checks
+on:
+  pull_request:
+  push:
+    branches: ['codex/v1.1-release-*']
+permissions:
+  contents: read
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  macos:
+    runs-on: macos-15
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: workbench-v8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: workbench-v8/package-lock.json
+      - run: npm ci
+      - name: Toolchain and native tests
+        run: |
+          rustc --version
+          cargo --version
+          cargo test --manifest-path src-tauri/Cargo.toml --locked
+      - name: Build unsigned macOS candidate
+        run: npm run tauri:build -- --ci --no-sign --bundles app,dmg -- --locked
+      - name: Launch bundled app
+        run: python3 ../scripts/macos-smoke.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: macos-unsigned-candidate
+          retention-days: 7
+          path: |
+            workbench-v8/src-tauri/target/release/bundle/macos/*.app
+            workbench-v8/src-tauri/target/release/bundle/dmg/*.dmg
+            workbench-v8/native-smoke.log
+            workbench-v8/native-smoke.png
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: workbench-v8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm run build
+      - run: cargo test --manifest-path src-tauri/Cargo.toml --locked
