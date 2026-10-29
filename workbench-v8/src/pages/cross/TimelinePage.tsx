@@ -1,3 +1,8 @@
+import { Link } from 'react-router-dom'
+import { liveQuery } from 'dexie'
+import { db } from '@/db/database'
+import { timestampDay } from '@/utils/helpers'
+import { resolveTimelineTarget } from '@/domain/navigation/timelineTarget'
 // ============================================================
 // V9 CROSS DOMAIN — Timeline 时间线页（事件投影展示）
 // 行 = sourceType/sourceId/eventType + 元数据（不复制事实载荷）
@@ -13,7 +18,7 @@ const DOMAIN_LABEL: Record<Domain, string> = { work: 'WORK', life: 'LIFE', play:
 function groupByDay(items: TimelineEvent[]): [string, TimelineEvent[]][] {
   const map = new Map<string, TimelineEvent[]>()
   for (const it of items) {
-    const day = it.occurredAt.slice(0, 10)
+    const day = timestampDay(it.occurredAt)
     const list = map.get(day) ?? []
     list.push(it)
     map.set(day, list)
@@ -30,6 +35,8 @@ export default function TimelinePage() {
 
   useEffect(() => {
     void load()
+    const subscription = liveQuery(() => db.timelineEvents.toArray()).subscribe(() => void load())
+    return () => subscription.unsubscribe()
   }, [load])
 
   const groups = useMemo(() => groupByDay(items), [items])
@@ -68,6 +75,7 @@ export default function TimelinePage() {
                   </span>
                 </div>
                 {it.summary && <p className={styles.itemBody}>{it.summary}</p>}
+                {resolveTimelineTarget(it) && <Link to={resolveTimelineTarget(it)!}>查看源记录 · {it.title}</Link>}
               </div>
             ))}
           </div>

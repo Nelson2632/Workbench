@@ -81,3 +81,6 @@
     transform: translateX(80px) scale(0.95);
   }
 }
+@media (prefers-reduced-motion: reduce) {
+  .toastEnter, .toastExit { animation: none; transform: none; }
+}

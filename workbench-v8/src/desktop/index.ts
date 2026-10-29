@@ -61,6 +61,7 @@ export async function openPomodoroFloat(): Promise<void> {
 export async function sendDesktopNotification(
   title: string,
   body: string,
+  route?: string,
 ): Promise<void> {
   if (!isDesktop()) return
   try {
@@ -71,7 +72,7 @@ export async function sendDesktopNotification(
       granted = (await requestPermission()) === 'granted'
     }
     if (granted) {
-      sendNotification({ title, body })
+      sendNotification({ title, body, ...(route ? { extra: { route } } : {}) })
     }
   } catch (err) {
     console.warn('[Workbench] Desktop notification failed:', err)

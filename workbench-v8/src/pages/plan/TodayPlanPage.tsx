@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router-dom'
 import TaskRecovery from '@/components/plan/TaskRecovery'
 import { isActiveTask } from '@/domain/planning/taskLifecycle'
 import { useEffect, useState, useMemo } from 'react'
@@ -40,6 +41,9 @@ export default function TodayPlanPage() {
   const { tasks, loading, loadTasks, addTask, updateTask, deleteTask, toggleDone, togglePin } = useTaskStore()
 
   const [inputValue, setInputValue] = useState('')
+  const [params] = useSearchParams()
+  const taskId = params.get('task')
+  const [sourceMissing, setSourceMissing] = useState(false)
   const [filter, setFilter] = useState<string>('all')
   // 详情弹窗状态：detailTask 非空即打开；detailMode 决定查看/编辑
   const [detailTask, setDetailTask] = useState<Task | null>(null)
@@ -48,6 +52,13 @@ export default function TodayPlanPage() {
   useEffect(() => {
     loadTasks()
   }, [loadTasks])
+
+  useEffect(() => {
+    if (!taskId || loading) return
+    const task = tasks.find(t => t.id === taskId)
+    setDetailTask(task ?? null)
+    setSourceMissing(!task)
+  }, [taskId, tasks, loading])
 
   const today = formatDate(new Date())
 
@@ -202,6 +213,7 @@ export default function TodayPlanPage() {
         </>
       )}
 
+      {sourceMissing && <p role="status">源任务已移除或无法找到。</p>}
       <TaskRecovery />
 
       <TaskDetailModal

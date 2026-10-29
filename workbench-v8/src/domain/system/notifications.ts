@@ -34,7 +34,7 @@ export function setupV9Notifications(): void {
     toastFn?.(`🎂 今天是好友的生日（${e.date}）`, 'success')
   })
   eventBus.subscribe('nightShutdown.completed', () => {
-    toastFn?.('今日收口完成，去复盘吧', 'success')
+    toastFn?.('今日已收口，今天到这里就好', 'success')
   })
   eventBus.subscribe('timeline.rebuilt', () => {
     toastFn?.('时间线投影已重建', 'info')

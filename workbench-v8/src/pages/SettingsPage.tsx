@@ -325,7 +325,7 @@ export default function SettingsPage() {
           </div>
           <div className={styles.sectionBody}>
             <div className={styles.themeRow}>
-              <span className={styles.themeLabel}>复盘提醒（每晚）</span>
+              <span className={styles.themeLabel}>收尾提醒（可选）</span>
               <div className={styles.themeToggle}>
                 <input
                   type="time"

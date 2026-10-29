@@ -41,13 +41,14 @@ export const useDailyMemoryStore = create<DailyMemoryState>((set) => ({
     try {
       // 事实派生（跨表读）在事务外；事务内只写 dailyMemory
       const facts = await aggregateDailyMemoryFacts(date)
-      const existing = await getDailyMemory(date)
       await runCommand<DailyMemory>({
         commandType: 'dailyMemory.refresh',
         commandId: 'cmd_' + uid(),
         tables: ['dailyMemory'],
-        mutate: () =>
-          upsertDailyMemoryRow(date, facts, existing?.reflection ?? '', new Date().toISOString()),
+        mutate: async () => {
+          const latest = await getDailyMemory(date)
+          return upsertDailyMemoryRow(date, facts, latest?.reflection ?? '', new Date().toISOString())
+        },
         afterCommit: (row) => {
           set({ row, loading: false })
         },
@@ -65,13 +66,10 @@ export const useDailyMemoryStore = create<DailyMemoryState>((set) => ({
       commandType: 'dailyMemory.saveReflection',
       commandId: 'cmd_' + uid(),
       tables: ['dailyMemory'],
-      mutate: () =>
-        upsertDailyMemoryRow(
-          date,
-          facts,
-          text,
-          existing ? existing.lastAutoUpdate : new Date().toISOString(),
-        ),
+      mutate: async () => {
+        const latest = await getDailyMemory(date)
+        return upsertDailyMemoryRow(date, latest?.facts ?? facts, text, latest?.lastAutoUpdate ?? new Date().toISOString())
+      },
       afterCommit: (row) => {
         set({ row })
       },

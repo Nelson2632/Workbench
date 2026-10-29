@@ -125,15 +125,15 @@
 .overdueSection {
   margin-top: var(--space-l2);
   padding: 14px 16px;
-  border: 1px solid var(--color-danger);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background: var(--color-danger-light);
+  background: var(--color-bg-secondary);
 }
 
 .overdueLabel {
   font-size: 13px;
   font-weight: var(--font-weight-semibold);
-  color: var(--color-danger);
+  color: var(--color-text-secondary);
   margin-bottom: 8px;
 }
 
@@ -149,8 +149,8 @@
   font-weight: var(--font-weight-semibold);
   padding: 2px 8px;
   border-radius: var(--radius-full);
-  background: var(--color-danger);
-  color: var(--color-text-inverse);
+  background: var(--color-border);
+  color: var(--color-text-primary);
   white-space: nowrap;
   flex-shrink: 0;
 }
