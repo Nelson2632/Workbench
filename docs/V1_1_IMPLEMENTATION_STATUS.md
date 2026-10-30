@@ -1,9 +1,25 @@
 # Workbench v1.1 实施记录
 
-状态：首批 P0 实现与工具链安全补丁已提交，尚未达到发布门槛。禁止据本文标记 v1.1/v10.1 Release Ready。
-补充核验：P0 代码 `1d83994` 的 [Actions run 40722066304](https://github.com/Nelson2632/Workbench/actions/runs/40722066304) 三时区、构建、两门禁和浏览器 5/5 均通过。下文浏览器失败记录属于本地环境；工具链修复与后续验收见 [安全补丁记录](./V1_1_SECURITY_TOOLCHAIN.md)。
+更新：2026-10-30（Asia/Shanghai）。基线：`97376e706f7f455bb290a25c07ababb397a862f0`。
 
-日期：2026-10-28（Asia/Shanghai）。基线：`97376e706f7f455bb290a25c07ababb397a862f0`。
+## 当前交付状态
+
+P0/P1 核心工作包及 P2 索引、投影批处理、本地可选计数、覆盖率和生成物政策已实现，代码按依赖拆分为 PR #2→#3→#4→#5→#6。全部尚未合并，main 未修改，未创建正式 Release。版本为 1.1.0-rc.1。
+
+| 工作包 | 交付 |
+|---|---|
+| P0 命令与反馈 | 稳定 intent、desired-state、幂等重试、关键投影屏障、真实完成反馈、失败保留输入 |
+| Start | Now≤1、Next≤4 且不重复；完整计划与无需计时的开始入口 |
+| Recover | 延期、拆分、暂存、放弃；预览、原子提交、持久 Undo、冲突保护 |
+| Memory/Shutdown | 源记录导航、实时刷新、历史同日、草稿保护、可选反思、默认关闭的夜间提醒 |
+| 可访问性 | 状态文字、持久错误 Toast、键盘关闭、reduced-motion；人工读屏仍待验证 |
+| 安全/工具链 | npm 单锁、已修复依赖告警、备份安全边界、最小 CSP、版本一致性 |
+| 性能与指标 | schema 9 时间索引、Timeline 批量派生、默认关闭的本地计数、关键模块覆盖率门禁 |
+| 桌面 | macOS 未签名 app/dmg 与进程启动检查、Windows 原生测试；正式签名、公证未执行 |
+
+最新验证证据、迁移说明、未完成的人工验收见 [发布候选验收](./V1_1_RELEASE_READINESS.md)。声音按审计继续延期；不接外部 analytics。自动检查通过不等于已经证明全部平台兼容性或可以免审发布。
+
+以下保留首批 P0 的审计与测试历史，历史测试数量/环境限制不代表最终分支状态。
 
 ## 依据与核实结果
 
@@ -14,20 +30,6 @@
 报告差异：当前 NightShutdownPage 是一个必填 reflection 字段，不存在 didWell/improve/canSubmit 片段。EventBus 事件使用 game.recorded、anime.episodeWatched、music.logged，不能照抄不存在的 gameRecord.created/anime.progressed。Tauri 已声明 minimumSystemVersion=10.15，但这不是本次实际兼容性测试结论。
 
 额外动态发现：原始单元测试在 America/New_York 下 293/295，通过切换 Asia/Shanghai 得到 295/295；原因是本地业务日期与 UTC 时间戳前十位混用。此次修复 Memory/Shutdown 的时间戳归日，不改 date-only 字段或历史时间戳。
-
-## 实施次序
-
-| 优先级/阶段 | 内容 | 本次状态 |
-|---|---|---|
-| P0-A | 稳定完成意图、显式 desiredDone、关键投影屏障、错误分层 | 已实现，单元及远端浏览器通过 |
-| P0-B | 独立 transient feedback、按意图去重、Reduced Motion | 已实现，远端运行时场景 5/5 通过 |
-| P0-C | Now≤1/Next≤4、完整计划入口、Capture 失败保留输入 | 已实现，选择器单元及远端浏览器通过 |
-| P0-D | 任务完成/撤销实时更新 Timeline 与 Daily Memory；本地日期 | 已实现，单元通过 |
-| P1-A | 非破坏式 Recover 生命周期、拆分、批量 preview/Undo、迁移 | 待实施，单独 PR，不能用 delete 代替 |
-| P1-B | Memory 回源与全面事件覆盖、可选反思、提醒策略、Toast | 待实施 |
-| P1-C | npm 单一管理器、仓库质量门、a11y/运行时回归 | 已新增 CI、test:run/web 与 npm 单一管理；远端 browser 通过，桌面 e2e 仍未验证 |
-| P1-D | CSP 与真实 macOS bundle/启动/备份升级验证 | 待 macOS 环境验证；此环境不能证明通过 |
-| P2 | 索引/批量投影性能、本地指标、声音、仓库归档 | 延后；不接外部 analytics |
 
 ## 首批代码行为
 
@@ -65,14 +67,8 @@
 
 CI 新增 UTC/Shanghai/New_York 单元矩阵、构建、现有两门禁、浏览器 motivation suite 和聚合 required job，Actions SHA 从官方仓库 ref 查询。已核对 P0 远端 Actions success（包括 5 个浏览器场景）；GitHub ruleset 需配置 required check 才能强制阻止合并，本 PR 不擅自更改管理员规则。
 
-## 合并与发布阻断项
+## 后续阶段
 
-1. P0 browser suite 已在远端通过，仍需人工三主题/焦点/读屏和真实桌面验证；当前 PR 保持 Draft。
-2. P1 Recover 等尚未实施；没有把任务生命周期、提醒、CSP 随 P0 一起改掉。
-3. 待投影恢复元数据与主事实同事务写入 systemCommandIds（可选非索引字段），清理幂等缓存时保留未完成恢复。重启 loadTasks 后恢复同步重试入口，修复历史派生数据不播放旧庆祝；此路径已有单元测试，桌面重启仍需实测。
-4. 跨窗口串行性不由模块内 FIFO 自动保证，需桌面多窗口验证。冷重放仅恢复派生数据，不重发历史庆祝。
-5. 旧 DailyMemoryStore 的手动刷新与反思路径仍应在 P1 进一步审查并发覆盖风险；此次只收紧背景聚合写入。
-6. 没有证明覆盖率、性能预算、完整安全审计、迁移备份升级与正式支持平台矩阵。
-7. 前端 package.version=0.0.0、Tauri=0.8.1、窗口标题 V8、设计 V9 的版本漂移留待 release PR 统一；不擅自改成 v10.1。
+首批 P0 的 Recover、Memory、依赖、安全、版本和迁移待办已由后续 PR 实现。正式发布仍需人工验收、签名策略和仓库审核；最终状态以发布候选验收文档为准。
 
-回滚：此批无 schema/index 或依赖升级，回退该代码提交即可；可选字段可留在本地对象中，不回写/删除历史数据。任何后续 schema 变更须独立升级/备份/恢复测试。
+P0 本身无 schema/index 变化；最终 RC 包含 schema 8→9 索引升级，回退应恢复升级前备份，不能直接套用 P0 的无迁移回滚方法。

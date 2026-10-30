@@ -29,3 +29,18 @@ for (const theme of ['晨雾书房', 'Windows', '深色夜航']) {
     expect(errors).toEqual([])
   })
 }
+
+
+test('closed mobile navigation is excluded from keyboard and accessibility navigation', async ({ page }) => {
+  await page.goto('/today')
+  const drawer = page.getByRole('complementary', { name: '主导航（移动端）' })
+  await expect(drawer).toHaveCount(0)
+  await expect(page.locator('#mobile-navigation')).toHaveAttribute('inert', '')
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.getByRole('button', { name: '打开菜单' }).click()
+  await expect(drawer).toBeVisible()
+  await expect(page.getByRole('button', { name: '打开菜单' })).toHaveAttribute('aria-expanded', 'true')
+  await drawer.getByRole('button', { name: '关闭菜单' }).click()
+  await expect(drawer).toHaveCount(0)
+  await expect(page.locator('#mobile-navigation')).toHaveAttribute('inert', '')
+})

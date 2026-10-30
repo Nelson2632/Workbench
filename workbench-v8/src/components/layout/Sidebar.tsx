@@ -380,6 +380,8 @@ export default function Sidebar() {
         className={styles.hamburger}
         onClick={toggleMobile}
         aria-label="打开菜单"
+        aria-expanded={mobileOpen}
+        aria-controls="mobile-navigation"
       >
         <span className={styles.hamburgerLine} />
         <span className={styles.hamburgerLine} />
@@ -400,6 +402,9 @@ export default function Sidebar() {
       {/* Mobile drawer */}
       <aside
         ref={drawerRef}
+        id="mobile-navigation"
+        inert={!mobileOpen}
+        aria-hidden={!mobileOpen}
         aria-label="主导航（移动端）"
         className={`${styles.sidebar} ${styles.mobileDrawer} ${mobileOpen ? styles.mobileDrawerOpen : ''}`}
       >

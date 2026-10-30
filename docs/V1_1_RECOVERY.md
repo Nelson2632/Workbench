@@ -11,6 +11,6 @@
 - Today、今日/未来计划、学习驾驶舱、学习计划、随机抽取、收尾与周期提醒排除非 active 待办。历史已完成事实保持不变。
 - 修复已删除任务的 pending projection 重试卡住：清理派生投影而不是要求事实仍存在。
 
-验证：Vitest 312/312；TypeScript/Vite 构建通过；contract 70/70、implementation 18/18。新增浏览器 preview/stash/重载/Undo 场景，等待远端 CI 验证。
+验证：Vitest 312/312；TypeScript/Vite 构建通过；contract 70/70、implementation 18/18。新增浏览器 preview/stash/重载/Undo 场景，远端 Actions 40725638994 已通过，包含 6 个浏览器场景。
 
 限制：撤销保留最近一次入口，旧凭据仍本地保存；没有自动清除用户历史。UI/原生平台验收在最终收口记录集中报告。

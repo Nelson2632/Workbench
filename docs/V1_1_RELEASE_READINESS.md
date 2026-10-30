@@ -13,7 +13,7 @@
 
 官方配置依据：https://v2.tauri.app/security/csp/ 、https://v2.tauri.app/distribute/macos-application-bundle/ 。
 
-此记录随最终检查更新；现阶段 native CI 尚待实际执行，不能把 workflow 文件存在视为检查通过。
+提交 `c8e4ee6` 的 [Desktop Actions 40903827331](https://github.com/Nelson2632/Workbench/actions/runs/40903827331) 已通过 macOS 构建、进程启动与 Windows 原生测试；[未签名候选工件](https://github.com/Nelson2632/Workbench/actions/runs/40903827331/artifacts/12910099051) 保留 7 天。后续浮窗最小权限修正将随最终提交再次验证。
 
 ## 数据与性能改动
 
@@ -34,10 +34,16 @@ Tauri Notification Actions 的官方支持仅限移动端（https://v2.tauri.app
 
 ## 当前自动化基线
 
-本地已执行：54 个测试文件、325 个用例通过；构建通过，最大 JS chunk 约 473 kB，不再有 >500 kB 警告；contract 70/70、implementation 18/18；npm audit 0。
+本地已执行：55 个测试文件、327 个用例通过；构建通过，最大 JS chunk 约 473 kB，不再有 >500 kB 警告；contract 70/70、implementation 18/18；npm audit 0。
 
 覆盖率限定为本次关键命令/恢复/选择器/Memory 代码，**不是全仓库覆盖率**：语句 85.95%、分支 79.91%、函数 76.80%、行 90.33%。CI 阈值分别 80/75/70/85%，维持已验证底线；不为表面覆盖率编写与实现镜像的测试。
 
 P2 本地指标已实现为默认关闭的可选四类计数（开始选择、捕获保存、完成反馈、计划调整），30 天保留期，可清除，不含内容或标识。它们不声称等同于投入时长、任务成功率或因果改善。
 
 浏览器包含开发态失败注入与实际 production dist+CSP 的三主题核心路径。native 与浏览器远端结果将按最终提交核对后补充。
+
+## 最终运行时修正
+
+生产构建测试发现并修复两项既有问题：周期生成命令重放返回 null 时不再解引用 generatedTasks；生成规则在事务中读取数据库，避免页面先挂载、store 尚未加载时把空规则标记为已生成。关闭的移动导航增加 inert/aria-hidden，桌面不显示移动抽屉。补测并发生成只产生一个任务/事件、重复页面访问、移动导航开关。
+
+番茄钟浮窗增加独立最小 capability，仅允许收起、拖动、向主窗发送事件。生产套件包含三主题核心路径和移动抽屉共 4 个场景；保留 pageerror/CSP 零错误断言，不用忽略异常的方式让测试通过。
