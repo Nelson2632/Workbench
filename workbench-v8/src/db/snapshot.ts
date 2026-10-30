@@ -1,3 +1,4 @@
+import { isVaultSetting, VAULT_SETTING_KEYS } from './backupBoundary'
 // ============================================================
 // Personal Workbench V9 — Backup 快照（V9-C-001 §4.18 / V9-C-003 §4）
 // Snapshot + Journal：SHA-256 校验、排除 vault/privateFileMeta/
@@ -6,7 +7,7 @@
 // ============================================================
 
 import { db } from '@/db/database'
-import { eventBus } from '@/domain/events/eventBus'
+import { eventBus, markJournaled } from '@/domain/events/eventBus'
 import { uid } from '@/utils/helpers'
 import { faultInjection } from '@/utils/faultInjection'
 import { sha256HexAsync } from '@/domain/security/crypto'
@@ -104,11 +105,14 @@ export function stableStringify(value: unknown): string {
 /** 导出快照表集（排除安全边界表） */
 export async function exportSnapshotTables(): Promise<Record<string, unknown[]>> {
   const tables = db.tables.map((t) => t.name).filter((n) => !SNAPSHOT_EXCLUDES.has(n))
-  const data: Record<string, unknown[]> = {}
-  for (const t of tables) {
-    data[t] = await db.table(t).toArray()
-  }
-  return data
+  return db.transaction('r', tables.map(name => db.table(name)), async () => {
+    const data: Record<string, unknown[]> = {}
+    for (const t of tables) {
+      const rows = await db.table(t).toArray()
+      data[t] = t === 'settings' ? rows.filter(row => !isVaultSetting(row)) : rows
+    }
+    return data
+  })
 }
 
 /** 快照类型（快照 ID 前缀编码，不占用 schema 字段） */
@@ -160,7 +164,7 @@ export async function createSnapshot(
   await faultInjection.fire('mid_backup_write')
   await writeSnapshotFile(snapshotId, JSON.stringify(payload))
   await journalEvent('backup.created', { snapshotId, reason: reason ?? null })
-  eventBus.publish({ type: 'backup.created', snapshotId })
+  eventBus.publish(markJournaled({ type: 'backup.created', snapshotId }))
   return { snapshotId, payload, itemCounts }
 }
 
@@ -191,21 +195,29 @@ export async function restoreSnapshot(snapshotId: string): Promise<void> {
   const payload = await readSnapshotPayload(snapshotId)
   if (!payload) throw new Error('快照不存在')
 
+  for (const [table, rows] of Object.entries(payload.data)) {
+    if (SNAPSHOT_EXCLUDES.has(table)) continue
+    if (!db.tables.some(t => t.name === table) || !Array.isArray(rows)) throw new Error(`快照表格式无效：${table}`)
+  }
   // 恢复前 safety snapshot（V9-C-003 §4 铁律）
   await createSnapshot('pre-restore-safety', 'safety')
 
   await db.transaction('rw', db.tables, async () => {
+    const vaultSettings = await db.settings.where('key').anyOf(VAULT_SETTING_KEYS).toArray()
     for (const [table, rows] of Object.entries(payload.data)) {
       // 双保险（Patch C-003-02）：即使旧格式快照带 appLock 数据也绝不恢复认证态
-      if (table === 'appLock') continue
+      if (SNAPSHOT_EXCLUDES.has(table)) continue
       const t = db.table(table)
       await t.clear()
-      if (rows.length > 0) await t.bulkAdd(rows)
+      const safeRows = table === 'settings' ? rows.filter(row => !isVaultSetting(row as { key?: unknown })) : rows
+      if (safeRows.length > 0) await t.bulkAdd(safeRows)
     }
+    await db.settings.bulkPut(vaultSettings)
+    await db.systemCommandIds.clear()
   })
 
   await journalEvent('restore.completed', { snapshotId })
-  eventBus.publish({ type: 'restore.completed', snapshotId })
+  eventBus.publish(markJournaled({ type: 'restore.completed', snapshotId }))
 
   // 恢复后动作（V9-C-002 §9 / V9-C-003 §4）：
   // 1) Journal 重放（快照时点之后的操作事件重新发布，触发联动）
@@ -216,12 +228,12 @@ export async function restoreSnapshot(snapshotId: string): Promise<void> {
 
 /** Journal 重放：将快照时点之后记录的事件按序重新发布到 EventBus（限流防雪崩） */
 export async function replayRecentJournal(cutoffIso: string, limit = 1000): Promise<number> {
-  const rows = await db.operationJournal.where('occurredAt').above(cutoffIso).toArray()
+  const rows = await db.operationJournal.where('occurredAt').aboveOrEqual(cutoffIso).toArray()
   const sorted = rows.sort((a, b) => a.seq - b.seq)
   let count = 0
   for (const r of sorted.slice(-limit)) {
     if (!r.payload) continue
-    eventBus.publish({ type: r.eventType, ...r.payload } as import('@/domain/events/eventBus').DomainEvent)
+    eventBus.publish(markJournaled({ ...r.payload, type: r.eventType } as import('@/domain/events/eventBus').DomainEvent))
     count++
   }
   return count

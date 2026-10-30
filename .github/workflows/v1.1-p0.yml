@@ -1,4 +1,4 @@
-name: Workbench v1.1 P0
+name: Workbench v1.1 quality
 on:
   pull_request:
   push:
@@ -32,13 +32,14 @@ jobs:
       - name: Dependency advisories
         if: matrix.timezone == 'UTC'
         run: npm audit --audit-level=moderate
-      - run: npm run test:run
+      - run: npm run test:run -- --coverage
       - run: npm run build
       - name: Contracts and implementation
         working-directory: .
         run: |
           node scripts/contract-gate.mjs
           node scripts/implementation-gate.mjs
+          node scripts/release-consistency.mjs
   browser:
     name: browser motivation loop
     runs-on: ubuntu-latest
@@ -55,6 +56,14 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e:web
+      - run: npm run build
+      - run: npm run test:e2e:production
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: browser-validation
+          retention-days: 7
+          path: workbench-v8/test-results
   required:
     name: required
     if: always()

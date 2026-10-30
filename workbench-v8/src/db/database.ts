@@ -1,3 +1,4 @@
+import { isVaultSetting, VAULT_SETTING_KEYS } from './backupBoundary'
 // ============================================================
 // Personal Workbench V8 — IndexedDB Database Layer (Dexie.js)
 // ============================================================
@@ -345,6 +346,14 @@ export class WorkbenchDB extends Dexie {
     // 触发全量索引重建 → 启动卡死。现改为 no-op（保留版本号以兼容可能已升到 8 的库）。
     this.version(8).stores({})
 
+    // Add indexes only to business fact tables. Never rebuild systemCommandIds.
+    // Missing timestamps remain missing; no invented completion facts/backfill.
+    this.version(9).stores({
+      tasks: '++id, dueDate, priority, done, pinned, projectId, createdAt, completedAt',
+      studySessions: '++id, subjectId, startedAt, endedAt',
+      mistakes: '++id, subject, mastered, createdAt, masteredAt',
+    })
+
     // The isAvailable() method handles error detection at runtime
   }
 
@@ -377,31 +386,38 @@ export class WorkbenchDB extends Dexie {
     await faultInjection.fire('mid_export')
     const tables = backupTableNames(this)
 
-    const result: Record<string, any[]> = {}
-    for (const table of tables) {
-      try {
-        result[table] = await this.table(table).toArray()
-      } catch (err) {
-        console.error(`[WorkbenchDB] Failed to export table "${table}":`, err)
-        result[table] = []
+    // One consistent read snapshot; an unreadable table must fail the backup,
+    // never silently serialize an empty table as a successful export.
+    return this.transaction('r', tables.map(name => this.table(name)), async () => {
+      const result: Record<string, any[]> = {}
+      for (const table of tables) {
+        const rows = await this.table(table).toArray()
+        result[table] = table === 'settings' ? rows.filter(row => !isVaultSetting(row)) : rows
       }
-    }
-    return result
+      return result
+    })
   }
 
   async importAllData(data: Record<string, any[]>): Promise<void> {
     // 普通导入：全部表 − 排除表（不触碰 vault/privateFileMeta/appLock 等安全边界）
     await faultInjection.fire('mid_import')
     const tables = backupTableNames(this)
+    for (const [name, rows] of Object.entries(data)) {
+      if (tables.includes(name) && !Array.isArray(rows)) throw new Error(`备份表格式无效：${name}`)
+    }
 
     try {
       await this.transaction('rw', this.tables, async () => {
+        const vaultSettings = await this.settings.where('key').anyOf(VAULT_SETTING_KEYS).toArray()
         for (const table of tables) {
           await this.table(table).clear()
-          if (Array.isArray(data[table]) && data[table].length > 0) {
-            await this.table(table).bulkAdd(data[table])
-          }
+          const rows = Array.isArray(data[table]) ? data[table] : []
+          const safeRows = table === 'settings' ? rows.filter(row => !isVaultSetting(row)) : rows
+          if (safeRows.length > 0) await this.table(table).bulkAdd(safeRows)
         }
+        await this.settings.bulkPut(vaultSettings)
+        // Receipts from the replaced database must not suppress fresh commands.
+        await this.systemCommandIds.clear()
       })
     } catch (err) {
       console.error('[WorkbenchDB] Failed to import data:', err)

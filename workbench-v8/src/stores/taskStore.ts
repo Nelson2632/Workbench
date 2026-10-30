@@ -1,3 +1,4 @@
+import { noteLocalMetric } from '@/domain/system/localMetrics'
 import { isActiveTask } from '@/domain/planning/taskLifecycle'
 // ============================================================
 // Personal Workbench V8 — Task Store
@@ -29,7 +30,7 @@ interface TaskState {
 
   restoreCompletionRetries: () => Promise<void>
   loadTasks: () => Promise<void>
-  addTask: (task: Partial<Task> & { title: string }) => Promise<void>
+  addTask: (task: Partial<Task> & { title: string }, commandId?: string) => Promise<void>
   updateTask: (id: string, updates: Partial<Task>) => Promise<void>
   deleteTask: (id: string) => Promise<void>
   toggleDone: (id: string) => Promise<void>
@@ -74,10 +75,10 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     }
   },
 
-  addTask: async (task) => {
+  addTask: async (task, commandId = 'cmd_' + uid()) => {
     const now = new Date().toISOString()
     const newTask: Task = {
-      id: uid(),
+      id: 'task_' + commandId,
       title: task.title,
       priority: task.priority || 'P2',
       done: false,
@@ -90,17 +91,17 @@ export const useTaskStore = create<TaskState>((set, get) => ({
       sourceRecurringId: task.sourceRecurringId,
     }
     await runCommand({
-      commandType: 'task.create',
-      commandId: 'cmd_' + uid(),
-      tables: ['tasks'],
+      commandType: 'task.create', commandId, tables: ['tasks'],
       mutate: async () => {
+        if (await db.tasks.get(newTask.id)) return false
         await db.tasks.add(newTask)
+        return true
       },
-      events: () => [{ type: 'task.created', taskId: newTask.id }],
-      afterCommit: () => {
-        set((s) => ({ tasks: [...s.tasks, newTask] }))
-      },
+      events: changed => changed ? [{ type: 'task.created', taskId: newTask.id }] : [],
     })
+    const canonical = await db.tasks.get(newTask.id)
+    if (!canonical) throw new Error('任务保存结果不可用')
+    set(s => ({ tasks: [...s.tasks.filter(t => t.id !== canonical.id), canonical] }))
   },
 
   updateTask: async (id, updates) => {
@@ -208,6 +209,7 @@ export const useTaskStore = create<TaskState>((set, get) => ({
       // Deduplicate per intent for this session, including after feedback expires.
       if (!state.silent && desiredDone && canonical?.done && (receipt.result?.changed || previous?.commandId === commandId) && !feedbackShown.has(commandId)) {
         feedbackShown.add(commandId)
+        noteLocalMetric('completionFeedback')
         set((s) => ({ feedback: [...s.feedback, { taskId, commandId, title: canonical.title }] }))
       }
     } catch (err) {

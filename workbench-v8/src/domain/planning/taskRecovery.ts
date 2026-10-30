@@ -1,3 +1,4 @@
+import { noteLocalMetric } from '@/domain/system/localMetrics'
 import { db } from '@/db/database'
 import { runCommand } from '@/db/mutationLane'
 import { uid } from '@/utils/helpers'
@@ -48,7 +49,7 @@ export async function getRecoveryReceipt(id: string): Promise<RecoveryReceipt | 
   return row ? JSON.parse(row.value) : undefined
 }
 export async function applyRecovery(preview: RecoveryPreview): Promise<RecoveryReceipt> {
-  await runCommand({ commandType: 'task.recover', commandId: preview.commandId, tables: ['tasks', 'settings'],
+  const result = await runCommand({ commandType: 'task.recover', commandId: preview.commandId, tables: ['tasks', 'settings'],
     mutate: async () => {
       if (await db.settings.get(key(preview.commandId))) return false
       await assertUnchanged(preview.before)
@@ -60,6 +61,7 @@ export async function applyRecovery(preview: RecoveryPreview): Promise<RecoveryR
     },
     events: changed => changed ? [...preview.after, ...preview.children].map(t => ({ type: 'task.updated' as const, taskId: t.id })) : [],
   })
+  if (result.result === true) noteLocalMetric('recoveryApplied')
   const receipt = await getRecoveryReceipt(preview.commandId)
   if (!receipt) throw new Error('调整记录不可用，请刷新后重新预览')
   return receipt

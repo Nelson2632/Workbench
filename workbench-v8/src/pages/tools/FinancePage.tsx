@@ -7,7 +7,12 @@ import EmptyState from '@/components/ui/EmptyState'
 import Card from '@/components/ui/Card'
 import { useToolStore } from '@/stores/toolStore'
 import { useToast } from '@/components/ui/Toast'
-import ReactEChartsCore from 'echarts-for-react'
+import ReactEChartsCore from 'echarts-for-react/esm/core'
+import * as echarts from 'echarts/core'
+import { PieChart, BarChart } from 'echarts/charts'
+import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
+echarts.use([PieChart, BarChart, GridComponent, TooltipComponent, LegendComponent, CanvasRenderer])
 import type { Finance, FinanceType } from '@/types'
 import styles from './FinancePage.module.css'
 
@@ -254,7 +259,7 @@ export default function FinancePage() {
         <Card className={styles.chartCard}>
           <h3 className={styles.chartTitle}>支出分类</h3>
           {expenseByCategory.length > 0 ? (
-            <ReactEChartsCore option={pieOption} style={{ height: 260 }} />
+            <ReactEChartsCore echarts={echarts} option={pieOption} style={{ height: 260 }} />
           ) : (
             <EmptyState icon="📊" title="暂无支出数据" />
           )}
@@ -262,7 +267,7 @@ export default function FinancePage() {
         <Card className={styles.chartCard}>
           <h3 className={styles.chartTitle}>近6月收支趋势</h3>
           {last6Months.some((m) => m.income > 0 || m.expense > 0) ? (
-            <ReactEChartsCore option={barOption} style={{ height: 260 }} />
+            <ReactEChartsCore echarts={echarts} option={barOption} style={{ height: 260 }} />
           ) : (
             <EmptyState icon="📈" title="暂无历史数据" />
           )}

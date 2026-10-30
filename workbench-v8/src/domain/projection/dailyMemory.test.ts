@@ -14,11 +14,12 @@ import {
   getDailyMemory,
   setupDailyMemory,
   _resetDailyMemoryForTests,
+  flushDailyMemoryEvents,
 } from './dailyMemory'
 
 const D = '2026-08-30'
 const NOON = new Date(2026, 7, 30, 12).toISOString()
-const flush = () => new Promise((r) => setTimeout(r, 25))
+const flush = flushDailyMemoryEvents
 
 async function seedFacts(): Promise<void> {
   const now = NOON
@@ -40,6 +41,7 @@ async function seedFacts(): Promise<void> {
 
 describe('Daily Memory', () => {
   beforeEach(async () => {
+    await flushDailyMemoryEvents()
     await db.delete()
     await db.open()
     eventBus.clear()

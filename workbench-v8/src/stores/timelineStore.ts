@@ -6,7 +6,7 @@ import { create } from 'zustand'
 import { db } from '../db/database'
 import { runCommand } from '../db/mutationLane'
 import { uid } from '../utils/helpers'
-import { deriveAllRows, writeProjectionRows } from '../domain/projection/timelineProjection'
+import { deriveAllRows, writeProjectionRows, PROJECTION_FACT_TABLES } from '../domain/projection/timelineProjection'
 import type { TimelineEvent } from '../types'
 
 interface TimelineState {
@@ -36,12 +36,11 @@ export const useTimelineStore = create<TimelineState>((set) => ({
     set({ loading: true })
     try {
       // 全量事实派生（跨表读）在事务外；事务内只写 timelineEvents
-      const derived = await deriveAllRows()
       const { result } = await runCommand<number>({
         commandType: 'timeline.rebuild',
         commandId: 'cmd_' + uid(),
-        tables: ['timelineEvents'],
-        mutate: () => writeProjectionRows(derived),
+        tables: ['timelineEvents', ...PROJECTION_FACT_TABLES],
+        mutate: async () => writeProjectionRows(await deriveAllRows()),
         events: () => [{ type: 'timeline.rebuilt' }],
       })
       const items = await db.timelineEvents.orderBy('occurredAt').reverse().toArray()

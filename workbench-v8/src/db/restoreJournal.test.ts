@@ -7,7 +7,7 @@ import 'fake-indexeddb/auto'
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { db } from '@/db/database'
 import { eventBus } from '@/domain/events/eventBus'
-import { setupJournalSink } from './journal'
+import { setupJournalSink, flushJournal } from './journal'
 import {
   createSnapshot,
   restoreSnapshot,
@@ -19,11 +19,12 @@ import {
   timelineKeySet,
   setupProjection,
   _resetProjectionForTests,
+  _flushProjectionForTests,
 } from '@/domain/projection/timelineProjection'
 
 const D = '2026-08-30'
 const NOON = new Date(2026, 7, 30, 12).toISOString()
-const flush = () => new Promise((r) => setTimeout(r, 25))
+const flush = async () => { await flushJournal(); await _flushProjectionForTests() }
 
 function useMemoryStorage() {
   const map = new Map<string, string>()
@@ -53,7 +54,8 @@ describe('Restore 全链路', () => {
     sinkOff = setupJournalSink()
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    await flush()
     sinkOff?.()
     eventBus.clear()
   })

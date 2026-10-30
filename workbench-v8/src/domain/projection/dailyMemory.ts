@@ -24,19 +24,23 @@ function isSameDay(iso: string, date: string): boolean {
 
 /** Facts 派生查询（V9-C-002 §6.2，全部可重建） */
 export async function aggregateDailyMemoryFacts(date: string): Promise<DailyMemoryFacts> {
+  const start = new Date(`${date}T00:00:00`)
+  const end = new Date(start)
+  end.setDate(end.getDate() + 1) // Local calendar day; DST can be 23/25 hours.
+  const from = start.toISOString(), to = end.toISOString()
   const [tasks, studySessions, pomodoroLogs, mistakes, flashcardReviews, diaries, lifeMoments, events, anime, gameRecords, music, shutdownRow] =
     await Promise.all([
-      db.tasks.toArray(),
-      db.studySessions.toArray(),
-      db.pomodoroLogs.toArray(),
-      db.mistakes.toArray(),
-      db.flashcardReviews.toArray(),
+      db.tasks.where('completedAt').between(from, to, true, false).toArray(),
+      db.studySessions.where('endedAt').between(from, to, true, false).toArray(),
+      db.pomodoroLogs.where('date').equals(date).toArray(),
+      db.mistakes.where('masteredAt').between(from, to, true, false).toArray(),
+      db.flashcardReviews.where('reviewedAt').between(from, to, true, false).toArray(),
       db.diaries.where('date').equals(date).toArray(),
       db.lifeMoments.where('date').equals(date).toArray(),
       db.events.where('date').equals(date).toArray(),
       db.anime.toArray(),
-      db.gameRecords.toArray(),
-      db.music.toArray(),
+      db.gameRecords.where('occurredAt').between(from, to, true, false).toArray(),
+      db.music.where('occurredAt').between(from, to, true, false).toArray(),
       db.nightShutdown.where('date').equals(date).first(),
     ])
 
@@ -47,7 +51,7 @@ export async function aggregateDailyMemoryFacts(date: string): Promise<DailyMemo
     studyMinutes = pomodoroLogs.filter((l) => l.date === date && l.completed).reduce((s, x) => s + x.duration, 0)
   }
 
-  const mistakesResolved = mistakes.filter((m) => m.mastered && (m as any).masteredAt && isSameDay((m as any).masteredAt, date)).length
+  const mistakesResolved = mistakes.filter((m) => m.mastered && m.masteredAt && isSameDay(m.masteredAt, date)).length
   const flashcardsReviewed = flashcardReviews.filter((r) => isSameDay(r.reviewedAt, date)).length
   const pomodoros = pomodoroLogs.filter((l) => l.date === date).length
   const nightShutdownDone = !!shutdownRow

@@ -1,6 +1,5 @@
 import { isActiveTask } from '@/domain/planning/taskLifecycle'
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { db } from '@/db/database'
 import { isDesktop, isQuickMemoWindow, sendDesktopNotification } from '@/desktop'
 import { formatDate } from '@/utils/helpers'
@@ -171,20 +170,6 @@ async function checkEventReminders(): Promise<void> {
  * while the desktop app is resident (tray keeps the process alive).
  */
 export function useDesktopNotifications(): void {
-  const navigate = useNavigate()
-  useEffect(() => {
-    if (!isDesktop() || isQuickMemoWindow()) return
-    let disposed = false
-    let remove: (() => void) | undefined
-    void import('@tauri-apps/plugin-notification').then(async ({ onAction }) => {
-      const listener = await onAction(notification => {
-        if (notification.extra?.route === '/today/night-shutdown') navigate('/today/night-shutdown')
-      })
-      if (disposed) listener.unregister()
-      else remove = () => listener.unregister()
-    }).catch(err => console.warn('[Notifications] action listener unavailable', err))
-    return () => { disposed = true; remove?.() }
-  }, [navigate])
   useEffect(() => {
     // Only run in the desktop shell's main window
     if (!isDesktop() || isQuickMemoWindow()) return

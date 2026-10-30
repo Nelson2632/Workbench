@@ -312,6 +312,7 @@
 /* ---- Mobile Drawer ---- */
 
 .mobileDrawer {
+  display: none;
   transform: translateX(-100%);
   transition: transform var(--transition-normal);
   z-index: 70;

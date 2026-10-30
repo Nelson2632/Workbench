@@ -126,7 +126,8 @@ export const useRecurringStore = create<RecurringState>((set, get) => ({
       mutate: async () => {
         const generatedTasks: Task[] = []
         const byRule: Record<string, string[]> = {}
-        for (const rt of get().recurringTasks) {
+        // Read canonical rules inside the transaction: the page can mount before store hydration.
+        for (const rt of await db.recurringTasks.toArray()) {
           if (!shouldGenerateForDate(rt, now)) continue
           const task: Task = {
             id: uid(),
@@ -169,6 +170,7 @@ export const useRecurringStore = create<RecurringState>((set, get) => ({
         }))
       },
     })
-    return result!.generatedTasks
+    // A replay creates no new tasks; Mutation Lane deliberately returns null.
+    return result?.generatedTasks ?? []
   },
 }))

@@ -346,3 +346,24 @@ pub fn run() {
             let _ = (&app, &event);
         });
 }
+
+#[cfg(test)]
+mod path_tests {
+    use super::{validate_rel_path, validate_snapshot_id};
+
+    #[test]
+    fn rejects_private_path_escape() {
+        for path in ["", "../secret", "/etc/passwd", "C:\\secret", "\\\\server\\share", "a/../../b"] {
+            assert!(validate_rel_path(path).is_err(), "accepted {path}");
+        }
+        assert!(validate_rel_path("abc-123.enc").is_ok());
+    }
+
+    #[test]
+    fn snapshots_are_single_identifiers() {
+        for id in ["", "..", "a/b", "a\\b", "C:foo"] {
+            assert!(validate_snapshot_id(id).is_err(), "accepted {id}");
+        }
+        assert!(validate_snapshot_id("v9-snap-manual-123-abc").is_ok());
+    }
+}

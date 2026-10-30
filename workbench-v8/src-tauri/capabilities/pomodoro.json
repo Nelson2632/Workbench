@@ -1,0 +1,11 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "pomodoro",
+  "description": "番茄钟浮窗：收起、拖动和通知主窗口",
+  "windows": ["pomodoro-float"],
+  "permissions": [
+    "core:window:allow-hide",
+    "core:window:allow-start-dragging",
+    "core:event:allow-emit-to"
+  ]
+}
