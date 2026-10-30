@@ -8,7 +8,7 @@ for (const theme of ['晨雾书房', 'Windows', '深色夜航']) {
       if (/violates.*Content Security Policy|Refused to.*because it violates/i.test(message.text())) errors.push(message.text())
     })
     await page.goto('/settings')
-    await page.getByRole('button', { name: new RegExp(theme) }).click()
+    await page.getByRole('complementary', { name: '主导航', exact: true }).getByRole('button', { name: new RegExp(theme) }).click()
     await page.goto('/plan/today')
     await page.getByLabel('新增任务').fill('真实构建任务')
     await page.getByRole('button', { name: '添加', exact: true }).click()

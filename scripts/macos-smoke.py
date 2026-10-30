@@ -1,4 +1,4 @@
-"""Launch the actual .app executable; check process survival and a visible window.
+"""Launch the actual .app executable; check process survival and retain a screen capture.
 This is a packaging/startup smoke, not a substitute for WebView interaction tests.
 """
 from pathlib import Path
