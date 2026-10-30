@@ -131,8 +131,8 @@ export class WorkbenchDB extends Dexie {
 
   private _available: boolean | null = null
 
-  constructor() {
-    super('WorkbenchV8')
+  constructor(name = 'WorkbenchV8') {
+    super(name)
 
     this.version(1).stores({
       tasks: '++id, dueDate, priority, done, pinned, projectId',

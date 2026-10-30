@@ -1,3 +1,4 @@
+mod desktop_smoke;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
@@ -215,6 +216,7 @@ pub fn run() {
     let (shortcut_memo, shortcut_toggle) = app_shortcuts();
 
     tauri::Builder::default()
+        .manage(desktop_smoke::SmokeReports::default())
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
                 .with_handler(move |app, shortcut, event| {
@@ -230,6 +232,8 @@ pub fn run() {
         )
         .plugin(tauri_plugin_notification::init())
         .invoke_handler(tauri::generate_handler![
+            desktop_smoke::desktop_smoke_enabled,
+            desktop_smoke::desktop_smoke_report,
             quit_app,
             open_pomodoro_float,
             v9_save_private_file,
@@ -273,7 +277,7 @@ pub fn run() {
             #[allow(unused_mut)]
             let mut tray = TrayIconBuilder::with_id("main-tray")
                 .icon(app.default_window_icon().unwrap().clone())
-                .tooltip("个人工作台 V8")
+                .tooltip("个人工作台")
                 .menu(&menu)
                 .show_menu_on_left_click(false);
 
@@ -314,6 +318,10 @@ pub fn run() {
                 })
                 .build(app)?;
 
+            if desktop_smoke::enabled() {
+                show_quick_memo(app.handle());
+                show_pomodoro_float(app.handle());
+            }
             Ok(())
         })
         .on_window_event(|window, event| {

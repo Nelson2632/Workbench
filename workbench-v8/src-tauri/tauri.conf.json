@@ -86,7 +86,8 @@
     },
     "windows": {
       "webviewInstallMode": {
-        "type": "downloadBootstrapper"
+        "type": "downloadBootstrapper",
+        "silent": true
       },
       "wix": {
         "language": "zh-CN"
@@ -95,7 +96,8 @@
         "languages": [
           "SimpChinese"
         ],
-        "displayLanguageSelector": false
+        "displayLanguageSelector": false,
+        "installMode": "currentUser"
       }
     }
   }

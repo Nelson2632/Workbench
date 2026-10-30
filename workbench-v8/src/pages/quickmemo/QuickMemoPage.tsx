@@ -1,3 +1,4 @@
+import { isComposingKey } from '@/utils/composition'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useRecordStore } from '@/stores/recordStore'
 import { hideCurrentWindow, emitToMainWindow, formatShortcutDisplay } from '@/desktop'
@@ -57,7 +58,7 @@ export default function QuickMemoPage() {
         e.preventDefault()
         setContent('')
         hideCurrentWindow()
-      } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      } else if (!isComposingKey(e) && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault()
         handleSave()
       }
