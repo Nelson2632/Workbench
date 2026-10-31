@@ -54,7 +54,7 @@ export default function QuickMemoPage() {
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Escape') {
+      if (!isComposingKey(e) && e.key === 'Escape') {
         e.preventDefault()
         setContent('')
         hideCurrentWindow()

@@ -24,13 +24,16 @@ export async function prepareNativeSmoke(): Promise<(() => Promise<void>) | unde
       checks.textLength = document.body.innerText.trim().length
       if (!checks.textLength) throw new Error('empty rendered content')
       if (label === 'main') {
-        const { WorkbenchDB } = await import('@/db/database')
+        const { db, WorkbenchDB } = await import('@/db/database')
+        if (!db.isOpen()) throw new Error('active database did not initialize')
+        const { portableBackup } = await import('@/db/fixtures/portableBackup')
+        const { verifyAndParseBackup } = await import('@/db/backup')
         // Separate disposable database: never clear/restore the user's active database.
         const sample = new WorkbenchDB(`WorkbenchNativeSmoke-${crypto.randomUUID()}`)
         try {
           await sample.open()
-          const now = new Date().toISOString()
-          await sample.tasks.add({ id: 'unicode', title: '中文任务🍵', priority: 'P1', done: true, completedAt: now, dueDate: '2026-10-30', createdAt: now, updatedAt: now, note: '跨平台\n备份', projectId: '', pinned: false })
+          const now = '2026-10-30T01:02:03.000Z'
+          await sample.importAllData(verifyAndParseBackup(portableBackup))
           await sample.settings.put({ key: 'vaultMasterHash', value: 'local-only' })
           const data = JSON.parse(JSON.stringify(await sample.exportAllData()))
           if (data.settings.some((s: { key: string }) => s.key === 'vaultMasterHash')) throw new Error('vault setting escaped ordinary backup')
@@ -41,6 +44,14 @@ export async function prepareNativeSmoke(): Promise<(() => Promise<void>) | unde
           if (await sample.tasks.where('completedAt').equals(now).count() !== 1) throw new Error('migration/index query failed')
           checks.indexedDB = true; checks.backupRoundtrip = true; checks.vaultBoundary = true
           checks.schemaVersion = sample.verno
+          const persistent = new WorkbenchDB('WorkbenchNativeSmokePersistence-v1')
+          try {
+            await persistent.open()
+            const marker = await persistent.settings.get('unicode')
+            checks.persistedFromPreviousLaunch = !!marker
+            if (marker && marker.value !== '跨平台🍵') throw new Error('WebView persistence changed')
+            if (!marker) await persistent.settings.put({ key: 'unicode', value: '跨平台🍵' })
+          } finally { persistent.close() }
         } finally { await sample.delete() }
       }
     } catch (error) { errors.push(String(error)) }

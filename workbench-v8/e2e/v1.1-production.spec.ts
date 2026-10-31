@@ -44,3 +44,15 @@ test('closed mobile navigation is excluded from keyboard and accessibility navig
   await expect(drawer).toHaveCount(0)
   await expect(page.locator('#mobile-navigation')).toHaveAttribute('inert', '')
 })
+
+test('Chinese composition confirmation does not submit capture', async ({ page }) => {
+  await page.goto('/plan/today')
+  const input = page.getByLabel('新增任务')
+  await input.fill('中文输入候选')
+  await input.dispatchEvent('keydown', { key: 'Enter', code: 'Enter', isComposing: true, bubbles: true })
+  await expect(input).toHaveValue('中文输入候选')
+  await expect(page.getByRole('button', { name: '标记为已完成' })).toHaveCount(0)
+  await input.press('Enter')
+  await expect(input).toHaveValue('')
+  await expect(page.getByText('中文输入候选', { exact: true })).toBeVisible()
+})

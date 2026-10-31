@@ -15,5 +15,6 @@ if ($p.ExitCode -ne 0) { throw "NSIS reinstall failed: $($p.ExitCode)" }
 python ../scripts/native-smoke.py $exe windows-reinstall-smoke.json
 if ($LASTEXITCODE -ne 0) { throw 'Reinstalled WebView smoke failed' }
 $reinstalled = Get-Content windows-reinstall-smoke.json -Raw | ConvertFrom-Json
+if (-not $reinstalled.webviews.main.checks.persistedFromPreviousLaunch) { throw 'Reinstall did not retain IndexedDB marker' }
 if (-not $reinstalled.native.persistedFromPreviousLaunch) { throw 'Reinstall did not retain app-data marker' }
 Get-FileHash $installer[0].FullName -Algorithm SHA256 | Format-List | Out-File windows-installer-sha256.txt

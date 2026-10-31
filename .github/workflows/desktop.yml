@@ -23,6 +23,7 @@ jobs:
           cache: npm
           cache-dependency-path: workbench-v8/package-lock.json
       - run: npm ci
+      - run: npm run test:run
       - run: npm run build
       - name: Toolchain and native tests
         run: |
@@ -57,7 +58,10 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 24
+      - name: Locate installed MSVC linker
+        run: ../scripts/windows-toolchain.ps1
       - run: npm ci
+      - run: npm run test:run
       - run: npm run build
       - run: cargo test --manifest-path src-tauri/Cargo.toml --locked
       - name: Build personal Windows installer
