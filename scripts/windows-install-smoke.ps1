@@ -12,7 +12,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Installed WebView smoke failed' }
 # Reinstall the same candidate without removing app data; rerun persistence checks.
 $p = Start-Process -FilePath $installer[0].FullName -ArgumentList @('/S', "/D=$installDir") -Wait -PassThru
 if ($p.ExitCode -ne 0) { throw "NSIS reinstall failed: $($p.ExitCode)" }
-python ../scripts/native-smoke.py $exe windows-reinstall-smoke.json
+python ../scripts/native-smoke.py $exe windows-reinstall-smoke.json --reserve-toggle
 if ($LASTEXITCODE -ne 0) { throw 'Reinstalled WebView smoke failed' }
 $reinstalled = Get-Content windows-reinstall-smoke.json -Raw | ConvertFrom-Json
 if (-not $reinstalled.webviews.main.checks.persistedFromPreviousLaunch) { throw 'Reinstall did not retain IndexedDB marker' }

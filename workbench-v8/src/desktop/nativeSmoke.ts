@@ -24,6 +24,16 @@ export async function prepareNativeSmoke(): Promise<(() => Promise<void>) | unde
       checks.textLength = document.body.innerText.trim().length
       if (!checks.textLength) throw new Error('empty rendered content')
       if (label === 'main') {
+        const shortcutWarnings = await invoke<string[]>('desktop_shortcut_warnings')
+        checks.shortcutWarnings = shortcutWarnings
+        if (shortcutWarnings.length) {
+          const warningDeadline = Date.now() + 5000
+          while (!shortcutWarnings.every(key => document.body.innerText.includes(key))) {
+            if (Date.now() > warningDeadline) throw new Error('shortcut conflict not shown to user')
+            await new Promise(resolve => setTimeout(resolve, 50))
+          }
+          checks.shortcutWarningVisible = true
+        }
         const { db, WorkbenchDB } = await import('@/db/database')
         if (!db.isOpen()) throw new Error('active database did not initialize')
         const { portableBackup } = await import('@/db/fixtures/portableBackup')
