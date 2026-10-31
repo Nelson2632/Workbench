@@ -1,8 +1,8 @@
-name: Desktop release checks
+name: Personal desktop checks
 on:
   pull_request:
   push:
-    branches: ['codex/v1.1-release-*']
+    branches: ['codex/v1.1-release-*', 'codex/v1.1-windows-*']
 permissions:
   contents: read
 concurrency:
@@ -23,6 +23,7 @@ jobs:
           cache: npm
           cache-dependency-path: workbench-v8/package-lock.json
       - run: npm ci
+      - run: npm run test:run
       - run: npm run build
       - name: Toolchain and native tests
         run: |
@@ -32,7 +33,9 @@ jobs:
       - name: Build unsigned macOS candidate
         run: npm run tauri:build -- --ci --no-sign --bundles app,dmg -- --locked
       - name: Launch bundled app
-        run: python3 ../scripts/macos-smoke.py
+        run: |
+          python3 ../scripts/macos-smoke.py
+          python3 ../scripts/native-smoke.py src-tauri/target/release/bundle/macos/*.app/Contents/MacOS/workbench-v8 macos-native-smoke.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -43,6 +46,7 @@ jobs:
             workbench-v8/src-tauri/target/release/bundle/dmg/*.dmg
             workbench-v8/native-smoke.log
             workbench-v8/native-smoke.png
+            workbench-v8/macos-native-smoke.*
   windows:
     runs-on: windows-latest
     timeout-minutes: 30
@@ -54,9 +58,25 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 24
+      - name: Locate installed MSVC linker
+        run: ../scripts/windows-toolchain.ps1
       - run: npm ci
+      - run: npm run test:run
       - run: npm run build
       - run: cargo test --manifest-path src-tauri/Cargo.toml --locked
+      - name: Build personal Windows installer
+        run: npm run tauri:build -- --ci --no-sign --bundles nsis -- --locked
+      - name: Install and verify real WebViews
+        run: ../scripts/windows-install-smoke.ps1
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: windows-personal-installer
+          retention-days: 7
+          path: |
+            workbench-v8/src-tauri/target/release/bundle/nsis/*-setup.exe
+            workbench-v8/windows-*-smoke.*
+            workbench-v8/windows-installer-sha256.txt
   desktop-required:
     if: always()
     needs: [macos, windows]

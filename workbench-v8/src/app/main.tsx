@@ -1,3 +1,4 @@
+import { prepareNativeSmoke } from '../desktop/nativeSmoke'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
@@ -14,6 +15,7 @@ const rootEl = document.getElementById('app')!
 const loadingEl = document.getElementById('app-loading')
 
 async function bootstrap() {
+  const finishSmoke = await prepareNativeSmoke()
   // Check DB availability
   const dbAvailable = await db.isAvailable()
   if (!dbAvailable) {
@@ -81,6 +83,7 @@ async function bootstrap() {
       </AppLockGate>
     </StrictMode>,
   )
+  if (finishSmoke) await finishSmoke()
 }
 
 bootstrap()

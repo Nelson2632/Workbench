@@ -65,3 +65,7 @@ npx tauri build --bundles app,dmg
 - 本仓库**不包含**个人应用数据（日记、好友、时间线备份等），相关目录已在 `.gitignore` 中排除。
 - 构建产物（`node_modules/`、`src-tauri/target/`、`dist/`）与本地工具链同样不入库。
 - 未附开源许可证，默认保留所有权利。
+
+## 个人双平台安装
+
+Workbench 仅供个人本地使用。Mac / Windows 安装包获取、WebView2、备份迁移及验证范围见 [个人桌面使用说明](docs/PERSONAL_DESKTOP_USE.md)。不要求代码签名、公证或公开 Release。
