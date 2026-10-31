@@ -1,3 +1,4 @@
+import { useReliableCapture } from '@/hooks/useReliableCapture'
 import { isComposingKey } from '@/utils/composition'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useRecordStore } from '@/stores/recordStore'
@@ -11,11 +12,16 @@ import styles from './QuickMemoPage.module.css'
  * notifies the main window so its store stays in sync.
  */
 export default function QuickMemoPage() {
-  const [content, setContent] = useState('')
   const [saved, setSaved] = useState(false)
-  const [saveError, setSaveError] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const addMemo = useRecordStore((s) => s.addMemo)
+  const capture = useReliableCapture(async (text, commandId) => {
+    await addMemo(text, commandId)
+    await emitToMainWindow('wb-quick-memo-saved', {})
+  })
+  const { value: content, setValue: setContent } = capture
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => () => { if (closeTimer.current) clearTimeout(closeTimer.current) }, [])
 
   // Focus the input whenever the window is (re)opened
   useEffect(() => {
@@ -28,35 +34,21 @@ export default function QuickMemoPage() {
     return () => window.removeEventListener('wb-quick-memo-open', focusInput)
   }, [])
 
-  const handleSave = useCallback(async () => {
-    const text = content.trim()
-    if (!text) {
-      await hideCurrentWindow()
-      return
-    }
-    try {
-      await addMemo(text)
-      await emitToMainWindow('wb-quick-memo-saved', { content: text })
-    } catch (err) {
-      // Keep the content so nothing is lost; surface the failure to the user
-      console.error('[QuickMemo] Save failed:', err)
-      setSaveError(true)
-      setTimeout(() => setSaveError(false), 2500)
-      return
-    }
-    setContent('')
+  const handleSave = async () => {
+    if (!await capture.submit()) return
     setSaved(true)
-    setTimeout(() => {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+    closeTimer.current = setTimeout(() => {
       setSaved(false)
-      hideCurrentWindow()
+      // A newer draft belongs to the next intent and must remain visible.
+      if (!textareaRef.current?.value.trim()) void hideCurrentWindow()
     }, 500)
-  }, [content, addMemo])
+  }
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (!isComposingKey(e) && e.key === 'Escape') {
         e.preventDefault()
-        setContent('')
         hideCurrentWindow()
       } else if (!isComposingKey(e) && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault()
@@ -83,6 +75,8 @@ export default function QuickMemoPage() {
         ref={textareaRef}
         className={styles.textarea}
         value={content}
+        aria-label="快捷备忘内容"
+        aria-busy={capture.pending}
         onChange={(e) => setContent(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={`想到什么，先记下来…\n(${formatShortcutDisplay('Ctrl+Enter')} 保存 · Esc 收起)`}
@@ -91,10 +85,10 @@ export default function QuickMemoPage() {
       />
 
       <div className={styles.footer}>
-        <span className={styles.hint}>
-          {saveError ? '✗ 保存失败，内容已保留' : saved ? '✓ 已保存' : `${formatShortcutDisplay('Ctrl+Enter')} 保存`}
+        <span className={styles.hint} role={capture.error ? 'alert' : 'status'}>
+          {capture.error ? capture.error : capture.pending ? '保存中…' : saved ? '✓ 已保存' : `${formatShortcutDisplay('Ctrl+Enter')} 保存`}
         </span>
-        <button className={styles.saveBtn} onClick={handleSave} disabled={!content.trim()}>
+        <button className={styles.saveBtn} onClick={handleSave} disabled={capture.pending || !content.trim()}>
           存入备忘录
         </button>
       </div>
