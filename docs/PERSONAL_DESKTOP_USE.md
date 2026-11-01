@@ -6,14 +6,14 @@
 
 打开仓库 Actions → **Personal desktop checks** → 选择 `codex/v1.1-windows-personal` 最新成功运行（代码依赖 PR #6），在 Artifacts 下载：
 
-- `macos-unsigned-candidate`：`.dmg`、`.app` 及检查日志。当前 macos-15 runner 产物为 Apple Silicon arm64；不能当作 Intel Mac 包。
+- `macos-unsigned-candidate`：`personal-mac-install.dmg`、SHA-256 与检查日志。当前 macos-15 runner 产物为 Apple Silicon arm64；不能当作 Intel Mac 包。CI 为 App 创建本机临时签名，并从最终 DMG 复制出 App 验证签名及启动；无需你手动重新签名。
 - `windows-personal-installer`：NSIS `*-setup.exe`、SHA-256 与安装/重装后的检查 JSON。当前 Windows runner 产物为 x64。
 
 工件保留 7 天。过期后重新执行该工作流；无需创建 Release。优先用 DMG/EXE，不依赖压缩包内 `.app` 的可执行权限。不要安装来自陌生分支或他人重打包的文件。
 
 ## 首次安装
 
-Mac：打开 DMG，把「个人工作台」拖到 Applications 后启动。如果未签名提示阻止打开，先核对下载源和构建提交，再在系统设置「隐私与安全性」针对这个应用允许打开。不要全局关闭 Gatekeeper；不要把“文件已损坏”或恶意软件告警一概当作签名提示绕过。
+Mac：打开 DMG，把「个人工作台」拖到 Applications 后启动。如果来源验证阻止打开，先核对下载源和构建提交，再在系统设置「隐私与安全性」针对这个应用允许打开。不要全局关闭 Gatekeeper。如果提示“文件已损坏”，先停止安装并反馈；旧工件曾因签名资源不匹配需要本机临时重新签名，新的 CI 会验证最终 DMG 的签名完整性。
 
 Windows：运行 NSIS EXE，默认只安装给当前用户，无需管理员安装。SmartScreen 可能显示未知发布者：只在确认来自自己仓库的成功构建、校验 SHA-256 一致后，对该文件选择允许；不要关闭 Defender 或系统级防护。PowerShell 可用 `Get-FileHash '<安装包路径>' -Algorithm SHA256` 对照工件里的哈希。
 
