@@ -145,3 +145,25 @@ test('opt-in night reminder has a working Shutdown CTA and can be dismissed', as
   await reminder.getByRole('button', { name: '今天先不提醒' }).click()
   await expect(reminder).toHaveCount(0)
 })
+
+test('quick memo preserves a newer draft while saving and Escape does not discard it', async ({ page }) => {
+  await page.goto('/quick-memo')
+  await page.evaluate(async () => {
+    const { faultInjection } = await import('/src/utils/faultInjection.ts')
+    faultInjection.enable()
+    faultInjection.inject('before_domain_commit', () => new Promise(resolve => setTimeout(resolve, 800)))
+  })
+  const input = page.getByLabel('快捷备忘内容')
+  await input.fill('第一段备忘')
+  await page.getByRole('button', { name: '存入备忘录' }).click()
+  await input.fill('尚未保存的新草稿')
+  await expect(input).toHaveAttribute('aria-busy', 'false')
+  await expect(input).toHaveValue('尚未保存的新草稿')
+  await input.press('Escape')
+  await expect(input).toHaveValue('尚未保存的新草稿')
+  const saved = await page.evaluate(async () => {
+    const { db } = await import('/src/db/database.ts')
+    return (await db.memos.toArray()).map(m => m.content)
+  })
+  expect(saved).toEqual(['第一段备忘'])
+})

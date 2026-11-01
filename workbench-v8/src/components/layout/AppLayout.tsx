@@ -1,3 +1,4 @@
+import DesktopWarnings from '@/desktop/DesktopWarnings'
 import ShutdownReminder from '@/components/plan/ShutdownReminder'
 import CompletionFeedback from '@/components/plan/CompletionFeedback'
 import { useMemo } from 'react'
@@ -55,6 +56,7 @@ export default function AppLayout() {
           data-visual-scope={isReviewCockpit ? 'review-data' : undefined}
         >
           <div className={`${styles.canvas} ${canvasClass}`}>
+            <DesktopWarnings />
             <CompletionFeedback />
             <ShutdownReminder />
             <Outlet />

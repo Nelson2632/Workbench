@@ -1,3 +1,4 @@
+import { isComposingKey } from '@/utils/composition'
 import { useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSystemStore, DEFAULT_SHORTCUTS } from '@/stores/systemStore'
@@ -49,6 +50,7 @@ export function useKeyboardShortcuts() {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      if (isComposingKey(e)) return
       // Don't trigger shortcuts when user is typing in input/textarea
       if (isInputFocused()) return
 

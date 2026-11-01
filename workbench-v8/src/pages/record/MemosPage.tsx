@@ -1,3 +1,4 @@
+import { isComposingKey } from '@/utils/composition'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { CSSProperties } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -73,7 +74,7 @@ export default function MemosPage() {
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      if (!isComposingKey(e) && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault()
         handleSave()
       }

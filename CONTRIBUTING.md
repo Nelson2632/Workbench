@@ -8,4 +8,4 @@
 
 建议维护者将 `required` 与 `desktop-required` 设置为 main 的 required checks，并要求 PR 审核。仓库内 workflow 不等同于 GitHub 管理端已启用强制策略。
 
-发布必须另行确认版本、签名/公证、平台矩阵与人工体验验收。Actions 工件是未签名候选，不是正式 Release。
+本项目仅供个人使用，不要求 Apple/Microsoft 签名、公证或正式 Release。双平台安装与人工体验验收见 docs/PERSONAL_DESKTOP_USE.md；Actions 提供短期未签名安装工件。

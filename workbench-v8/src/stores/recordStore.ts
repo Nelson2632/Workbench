@@ -15,7 +15,7 @@ interface RecordState {
 
   // Memos
   loadMemos: () => Promise<void>
-  addMemo: (content: string) => Promise<void>
+  addMemo: (content: string, commandId?: string) => Promise<void>
   updateMemo: (id: string, updates: Partial<Memo>) => Promise<void>
   deleteMemo: (id: string) => Promise<void>
   convertMemoToTask: (memoId: string) => Promise<void>
@@ -42,23 +42,24 @@ export const useRecordStore = create<RecordState>((set, get) => ({
     set({ memos, loading: false })
   },
 
-  addMemo: async (content) => {
+  addMemo: async (content, commandId = 'cmd_' + uid()) => {
     const memo: Memo = {
-      id: uid(),
+      id: 'memo_' + commandId,
       content,
       createdAt: new Date().toISOString(),
     }
     await runCommand({
       commandType: 'memo.create',
-      commandId: 'cmd_' + uid(),
+      commandId,
       tables: ['memos'],
       mutate: async () => {
-        await db.memos.add(memo)
-      },
-      afterCommit: () => {
-        set((s) => ({ memos: [memo, ...s.memos] }))
+        const existing = await db.memos.get(memo.id)
+        if (existing && existing.content !== content) throw new Error('Memo intent content changed')
+        if (!existing) await db.memos.add(memo)
       },
     })
+    const canonical = await db.memos.get(memo.id)
+    if (canonical) set((s) => ({ memos: [canonical, ...s.memos.filter(m => m.id !== canonical.id)] }))
   },
 
   updateMemo: async (id, updates) => {

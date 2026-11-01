@@ -1,3 +1,4 @@
+import { isComposingKey } from '@/utils/composition'
 import { noteLocalMetric } from '@/domain/system/localMetrics'
 import { isActiveTask } from '@/domain/planning/taskLifecycle'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -378,7 +379,7 @@ export default function TodayPage() {
           value={captureValue}
           onChange={(e) => setCaptureValue(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') void handleCapture()
+            if (!isComposingKey(e) && e.key === 'Enter') void handleCapture()
           }}
           placeholder="记点什么，Enter 进入收件箱…"
           aria-label="快速捕获"

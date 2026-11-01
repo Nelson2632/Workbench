@@ -1,3 +1,4 @@
+import { isComposingKey } from '@/utils/composition'
 import { useEffect, useState, useMemo, type KeyboardEvent, type ChangeEvent } from 'react'
 import { useReliableCapture } from '@/hooks/useReliableCapture'
 import PageHeader from '@/components/layout/PageHeader'
@@ -43,7 +44,7 @@ export default function InboxPage() {
   const handleAdd = () => { void capture.submit() }
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (!isComposingKey(e) && e.key === 'Enter') {
       handleAdd()
     }
   }

@@ -1,3 +1,4 @@
+import { isComposingKey } from '@/utils/composition'
 import { useReliableCapture } from '@/hooks/useReliableCapture'
 import { useSearchParams } from 'react-router-dom'
 import TaskRecovery from '@/components/plan/TaskRecovery'
@@ -83,7 +84,7 @@ export default function TodayPlanPage() {
   const handleQuickAdd = () => { void capture.submit() }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (!isComposingKey(e) && e.key === 'Enter') {
       handleQuickAdd()
     }
   }

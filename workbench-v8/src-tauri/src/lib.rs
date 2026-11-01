@@ -1,3 +1,4 @@
+mod desktop_smoke;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
@@ -29,7 +30,7 @@ fn show_pomodoro_float(app: &tauri::AppHandle) {
 fn toggle_main_window(app: &tauri::AppHandle) {
     if let Some(w) = app.get_webview_window("main") {
         let visible = w.is_visible().unwrap_or(false);
-        if visible {
+        if visible && !w.is_minimized().unwrap_or(false) {
             let _ = w.hide();
         } else {
             let _ = w.show();
@@ -37,6 +38,14 @@ fn toggle_main_window(app: &tauri::AppHandle) {
             let _ = w.set_focus();
         }
     }
+}
+
+#[derive(Default)]
+struct ShortcutWarnings(std::sync::Mutex<Vec<String>>);
+
+#[tauri::command]
+fn desktop_shortcut_warnings(state: tauri::State<'_, ShortcutWarnings>) -> Vec<String> {
+    state.0.lock().map(|warnings| warnings.clone()).unwrap_or_default()
 }
 
 #[tauri::command]
@@ -215,6 +224,8 @@ pub fn run() {
     let (shortcut_memo, shortcut_toggle) = app_shortcuts();
 
     tauri::Builder::default()
+        .manage(desktop_smoke::SmokeReports::default())
+        .manage(ShortcutWarnings::default())
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
                 .with_handler(move |app, shortcut, event| {
@@ -230,6 +241,9 @@ pub fn run() {
         )
         .plugin(tauri_plugin_notification::init())
         .invoke_handler(tauri::generate_handler![
+            desktop_smoke::desktop_smoke_enabled,
+            desktop_smoke::desktop_smoke_report,
+            desktop_shortcut_warnings,
             quit_app,
             open_pomodoro_float,
             v9_save_private_file,
@@ -247,11 +261,13 @@ pub fn run() {
             let gs = app.global_shortcut();
             if !gs.is_registered(shortcut_memo) {
                 if let Err(e) = gs.register(shortcut_memo) {
+                    app.state::<ShortcutWarnings>().0.lock().unwrap().push(SHORTCUT_MEMO_DESC.into());
                     eprintln!("[workbench] global shortcut {SHORTCUT_MEMO_DESC} register failed (degraded): {e}");
                 }
             }
             if !gs.is_registered(shortcut_toggle) {
                 if let Err(e) = gs.register(shortcut_toggle) {
+                    app.state::<ShortcutWarnings>().0.lock().unwrap().push(SHORTCUT_TOGGLE_DESC.into());
                     eprintln!("[workbench] global shortcut {SHORTCUT_TOGGLE_DESC} register failed (degraded): {e}");
                 }
             }
@@ -273,7 +289,7 @@ pub fn run() {
             #[allow(unused_mut)]
             let mut tray = TrayIconBuilder::with_id("main-tray")
                 .icon(app.default_window_icon().unwrap().clone())
-                .tooltip("个人工作台 V8")
+                .tooltip("个人工作台")
                 .menu(&menu)
                 .show_menu_on_left_click(false);
 
@@ -314,6 +330,10 @@ pub fn run() {
                 })
                 .build(app)?;
 
+            if desktop_smoke::enabled() {
+                show_quick_memo(app.handle());
+                show_pomodoro_float(app.handle());
+            }
             Ok(())
         })
         .on_window_event(|window, event| {
